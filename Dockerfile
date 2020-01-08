@@ -91,4 +91,4 @@ COPY --from=lokibuilder /loki/out_loki.so /fluent-bit/lib
 EXPOSE 2020
 
 # Entry point
-CMD ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.conf"]
+CMD ["/fluent-bit/bin/fluent-bit", "-e", "/fluent-bit/lib/out_loki.so", "-c", "/fluent-bit/etc/fluent-bit.conf"]

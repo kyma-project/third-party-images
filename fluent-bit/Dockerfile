@@ -57,7 +57,6 @@ RUN cp conf/fluent-bit.conf \
        /fluent-bit/etc/
 
 
-
 FROM golang:1.13 as lokibuilder
 
 ENV LOKI_VERSION 1.2.0
@@ -68,9 +67,6 @@ RUN curl -L https://github.com/grafana/loki/archive/v${LOKI_VERSION}.tar.gz | \
 WORKDIR /tmp/src
 RUN make clean && make BUILD_IN_CONTAINER=false fluent-bit-plugin 
 RUN cp /tmp/src/cmd/fluent-bit/out_loki.so /loki
-
-
-
 
 FROM debian:testing-slim
 LABEL Maintainer="Team Idefix <team-idefix@sap.com>"
@@ -87,7 +83,6 @@ RUN apt-get update && \
 COPY --from=builder /fluent-bit /fluent-bit
 COPY --from=lokibuilder /loki/out_loki.so /fluent-bit/lib
 
-#
 EXPOSE 2020
 
 # Entry point

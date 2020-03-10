@@ -11,9 +11,9 @@ COPY ./config-example.yml /etc/docker/registry/config.yml
 VOLUME ["/var/lib/registry"]
 EXPOSE 5000
 
-LABEL source=git@github.com:kyma-project/kyma.git
-
 COPY docker-entrypoint.sh /entrypoint.sh
+
+LABEL source=git@github.com:kyma-project/kyma.git
 ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["/etc/docker/registry/config.yml"]

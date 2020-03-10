@@ -14,6 +14,6 @@ EXPOSE 5000
 COPY docker-entrypoint.sh /entrypoint.sh
 
 LABEL source=git@github.com:kyma-project/kyma.git
-ENTRYPOINT ["/entrypoint.sh"]
 
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/etc/docker/registry/config.yml"]

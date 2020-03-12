@@ -11,5 +11,8 @@
 # The `distibution-library-image` repo
 /distribution-library-image/ @michal-hudy @m00g3n @aerfio @magicmatatjahu
 
+# The `minio` repo
+/minio/ @michal-hudy @m00g3n @aerfio @magicmatatjahu
+
 # All .md files
 *.md @bszwarc @majakurcius @tomekpapiernik @kazydek @klaudiagrz @alexandra-simeonova @mmitoraj

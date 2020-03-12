@@ -14,5 +14,8 @@
 # The `minio` repo
 /minio/ @michal-hudy @m00g3n @aerfio @magicmatatjahu
 
+# The `minio client` repo
+/minio-mc/ @michal-hudy @m00g3n @aerfio @magicmatatjahu
+
 # All .md files
 *.md @bszwarc @majakurcius @tomekpapiernik @kazydek @klaudiagrz @alexandra-simeonova @mmitoraj

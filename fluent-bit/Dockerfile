@@ -1,7 +1,7 @@
 FROM debian:testing-slim as builder
 
 # Fluent Bit version
-ENV FLB_VERSION 1.3.4
+ENV FLB_VERSION 1.3.10
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && \
@@ -59,7 +59,7 @@ RUN cp conf/fluent-bit.conf \
 
 FROM golang:1.13 as lokibuilder
 
-ENV LOKI_VERSION 1.2.0
+ENV LOKI_VERSION 1.3.0
 
 RUN mkdir -p /tmp/src /loki
 RUN curl -L https://github.com/grafana/loki/archive/v${LOKI_VERSION}.tar.gz | \
@@ -69,8 +69,6 @@ RUN make clean && make BUILD_IN_CONTAINER=false fluent-bit-plugin
 RUN cp /tmp/src/cmd/fluent-bit/out_loki.so /loki
 
 FROM debian:testing-slim
-LABEL Maintainer="Team Idefix <team-idefix@sap.com>"
-LABEL Description="Fluent Bit docker image" Vendor="Idefix" Version="1.3.3"
 
 RUN apt-get update && \
     apt-get -y dist-upgrade && \
@@ -85,5 +83,6 @@ COPY --from=lokibuilder /loki/out_loki.so /fluent-bit/lib
 
 EXPOSE 2020
 
-# Entry point
+LABEL source=git@github.com:kyma-project/kyma.git
+
 CMD ["/fluent-bit/bin/fluent-bit", "-e", "/fluent-bit/lib/out_loki.so", "-c", "/fluent-bit/etc/fluent-bit.conf"]

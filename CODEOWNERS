@@ -17,5 +17,11 @@
 # The `minio client` repo
 /minio-mc/ @michal-hudy @m00g3n @aerfio @magicmatatjahu
 
+# The `kubeless-function-controller` repo
+/kubeless-function-controller/ @michal-hudy @m00g3n @aerfio @magicmatatjahu
+
+# The `kubeless function image builder` repo
+/kubeless-function-image-builder/ @michal-hudy @m00g3n @aerfio @magicmatatjahu
+
 # All .md files
 *.md @bszwarc @majakurcius @tomekpapiernik @kazydek @klaudiagrz @alexandra-simeonova @mmitoraj

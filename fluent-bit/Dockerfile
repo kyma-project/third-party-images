@@ -1,7 +1,7 @@
 FROM debian:testing-slim as builder
 
 # Fluent Bit version
-ENV FLB_VERSION 1.3.10
+ENV FLB_VERSION 1.4.1
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && \

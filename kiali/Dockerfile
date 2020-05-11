@@ -1,4 +1,4 @@
-FROM quay.io/kiali/kiali:v1.17.0 as builder
+FROM quay.io/kiali/kiali:v1.18.0 as builder
 
 FROM alpine:3.11
 

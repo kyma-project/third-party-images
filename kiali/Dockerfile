@@ -1,4 +1,4 @@
-FROM quay.io/kiali/kiali:v1.18.0 as builder
+FROM quay.io/kiali/kiali:v1.18.1 as builder
 
 FROM alpine:3.11
 
@@ -12,9 +12,12 @@ COPY --from=builder $KIALI_HOME/console/ $KIALI_HOME/console/
 
 RUN apk add --no-cache bash
 
-RUN chgrp -R 0 $KIALI_HOME/console && \
+RUN adduser -D kiali && \
+    chown -R kiali:kiali $KIALI_HOME/console && \
     chmod -R g=u $KIALI_HOME/console
 
 LABEL source=git@github.com:kyma-project/kyma.git
+
+USER kiali
 
 ENTRYPOINT ["/opt/kiali/kiali"]

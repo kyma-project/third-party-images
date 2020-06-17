@@ -1,6 +1,6 @@
 FROM registry:2.7.1 as builder
 
-FROM alpine:3.11
+FROM alpine:3.12
 
 RUN set -ex \
     && apk add --no-cache ca-certificates apache2-utils

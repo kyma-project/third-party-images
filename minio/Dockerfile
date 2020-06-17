@@ -1,6 +1,6 @@
 FROM minio/minio:RELEASE.2019-10-12T01-39-57Z as builder
 
-FROM alpine:3.11
+FROM alpine:3.12
 
 LABEL source=git@github.com:kyma-project/kyma.git
 

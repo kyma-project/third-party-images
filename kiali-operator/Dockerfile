@@ -1,6 +1,6 @@
-FROM quay.io/kiali/kiali-operator:v1.19.0 AS builder
+FROM quay.io/kiali/kiali-operator:v1.20.0 AS builder
 
-FROM alpine:3.11
+FROM alpine:3.12
 
 ENV OPERATOR=/usr/local/bin/ansible-operator \
     USER_UID=1001 \
@@ -13,7 +13,8 @@ ENV OPERATOR=/usr/local/bin/ansible-operator \
     && echo 'roles_path = /opt/ansible/roles' >> /etc/ansible/ansible.cfg \
     && echo 'library = /usr/share/ansible/openshift' >> /etc/ansible/ansible.cfg
 
-RUN apk add --no-cache bash build-base curl tini libffi-dev openssl-dev python3-dev py-pip py3-setuptools \
+RUN apk --no-cache upgrade \
+ && apk add --no-cache bash build-base curl tini libffi-dev openssl-dev python3-dev py-pip py3-setuptools \ 
  && pip3 install --no-cache-dir --ignore-installed ipaddress \
     ansible-runner==1.3.4 \
     ansible-runner-http==1.0.0 \

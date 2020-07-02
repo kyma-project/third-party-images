@@ -1,4 +1,4 @@
-FROM debian:testing-slim as builder
+FROM debian:testing-20200607-slim as builder
 
 # Fluent Bit version
 ENV FLB_VERSION 1.4.6
@@ -68,7 +68,7 @@ WORKDIR /tmp/src
 RUN make clean && make BUILD_IN_CONTAINER=false fluent-bit-plugin 
 RUN cp /tmp/src/cmd/fluent-bit/out_loki.so /loki
 
-FROM debian:testing-slim
+FROM debian:testing-20200607-slim
 
 RUN apt-get update && \
     apt-get -y dist-upgrade && \

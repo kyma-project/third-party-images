@@ -1,4 +1,4 @@
-FROM jaegertracing/jaeger-operator:1.17.1 as builder
+FROM jaegertracing/jaeger-operator:1.18.1 as builder
 
 FROM scratch
 

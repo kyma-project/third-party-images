@@ -1,4 +1,4 @@
-FROM debian:testing-20200607-slim as builder
+FROM debian:testing-20200720-slim as builder
 
 # Fluent Bit version
 ENV FLB_VERSION 1.4.6

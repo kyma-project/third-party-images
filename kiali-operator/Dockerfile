@@ -7,7 +7,7 @@ ENV OPERATOR=/usr/local/bin/ansible-operator \
     USER_NAME=ansible-operator\
     HOME=/opt/ansible
 
- RUN mkdir -p /etc/ansible && mkdir -p /tmp/ansible-operator \
+RUN mkdir -p /etc/ansible && mkdir -p /tmp/ansible-operator \
     && echo "localhost ansible_connection=local" > /etc/ansible/hosts \
     && echo '[defaults]' > /etc/ansible/ansible.cfg \
     && echo 'roles_path = /opt/ansible/roles' >> /etc/ansible/ansible.cfg \

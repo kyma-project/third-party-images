@@ -1,6 +1,6 @@
 FROM kiwigrid/k8s-sidecar:0.1.178 as builder
 
-FROM python:3.9.0b5-alpine3.12
+FROM python:3.9.0rc1-alpine3.12
 
 ENV PYTHONUNBUFFERED=1
 

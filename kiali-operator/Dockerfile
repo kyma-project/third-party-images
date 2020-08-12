@@ -38,4 +38,4 @@ LABEL source=git@github.com:kyma-project/kyma.git
 
 ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/entrypoint"]
 
-USER ${USER_UID}
+USER ${USER_UID} 

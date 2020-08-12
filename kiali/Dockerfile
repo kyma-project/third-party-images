@@ -19,6 +19,6 @@ RUN adduser -D kiali && \
 
 LABEL source=git@github.com:kyma-project/kyma.git
 
-USER kiali
+USER kiali 
 
 ENTRYPOINT ["/opt/kiali/kiali"]

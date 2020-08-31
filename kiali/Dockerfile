@@ -10,8 +10,7 @@ WORKDIR $KIALI_HOME
 COPY --from=builder $KIALI_HOME/ $KIALI_HOME/
 COPY --from=builder $KIALI_HOME/console/ $KIALI_HOME/console/
 
-RUN apk --no-cache upgrade \
- && apk add --no-cache bash
+RUN apk --no-cache upgrade
 
 RUN adduser -D kiali && \
     chown -R kiali:kiali $KIALI_HOME/console && \

@@ -13,7 +13,7 @@ COPY --from=builder /app/* /app/
 RUN apk --no-cache upgrade && \
     apk --no-cache add gcc && \
 	pip install -r requirements.txt && \
-	apk del -r gcc && \
+	apk del -r gcc sqlite && \
     rm -rf /var/cache/apk/* requirements.txt
 
 USER 65534:65534

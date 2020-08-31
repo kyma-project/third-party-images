@@ -21,7 +21,7 @@ RUN apk --no-cache upgrade \
     openshift~=0.10.0 \
     ansible~=2.9 \
     jmespath \
- && apk del build-base libffi-dev openssl-dev python3-dev
+ && apk del build-base libffi-dev openssl-dev python3-dev sqlite
 
 COPY --from=builder /opt/ansible/roles/ /opt/ansible/roles/
 COPY --from=builder /opt/ansible/playbooks/ /opt/ansible/playbooks/

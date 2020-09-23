@@ -1,4 +1,4 @@
-FROM minio/minio:RELEASE.2019-10-12T01-39-57Z as builder
+FROM minio/minio:RELEASE.2020-09-21T22-31-59Z as builder
 
 FROM alpine:3.12
 

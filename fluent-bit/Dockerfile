@@ -76,7 +76,7 @@ WORKDIR /tmp/src
 RUN make clean && make BUILD_IN_CONTAINER=false fluent-bit-plugin 
 RUN cp /tmp/src/cmd/fluent-bit/out_loki.so /loki
 
-FROM debian:testing-20200908-slim
+FROM debian:testing-20201012-slim
 
 RUN apt-get update && \
     apt-get -y dist-upgrade && \

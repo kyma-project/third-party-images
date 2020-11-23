@@ -12,8 +12,11 @@ RUN curl -LO https://github.com/prometheus/node_exporter/releases/download/v${ex
 FROM scratch
 
 COPY --from=builder /tmp/node_exporter /usr/local/bin/
+COPY --from=builder /etc/passwd /etc/passwd
 
 EXPOSE 9100
+
+USER nobody
 
 LABEL source=git@github.com:kyma-project/kyma.git
 

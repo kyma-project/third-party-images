@@ -1,6 +1,6 @@
 FROM alpine as builder
 
-ENV exporter_version 0.18.1
+ENV exporter_version 1.0.1
 
 RUN apk update && apk upgrade && \
     apk add --no-cache bash curl

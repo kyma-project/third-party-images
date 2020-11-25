@@ -10,7 +10,7 @@ LABEL source=git@github.com:kyma-project/third-party-images.git
 
 ENV HELM_2_VERSION="v2.16.12"
 ENV HELM_3_VERSION="v3.3.4"
-ENV KUBECTL_VERSION="v1.17.3"
+ENV KUBECTL_VERSION="v1.19.0"
 
 RUN apk --no-cache upgrade &&\
     apk --no-cache add openssl coreutils curl bash jq grep &&\

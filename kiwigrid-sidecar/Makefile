@@ -1,12 +1,12 @@
 APP_NAME ?= k8s-sidecar
-KIWIGRID_SIDECAR_VERSION = 0.1.178
+KIWIGRID_SIDECAR_VERSION = 1.1.0
 TAG = $(KIWIGRID_SIDECAR_VERSION)-$(DOCKER_TAG)
 IMG = $(DOCKER_PUSH_REPOSITORY)$(DOCKER_PUSH_DIRECTORY)/$(APP_NAME):$(TAG)
 
 # Build the docker image
 .PHONY: docker-build
 docker-build:
-	docker build . -t ${IMG}
+	docker build . -t ${IMG} --build-arg KIWIGRID_SIDECAR_VERSION=$(KIWIGRID_SIDECAR_VERSION)
 
 # Push the docker image
 .PHONY: docker-push

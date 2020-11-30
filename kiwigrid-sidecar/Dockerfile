@@ -1,19 +1,22 @@
-FROM kiwigrid/k8s-sidecar:0.1.178 as builder
+ARG KIWIGRID_SIDECAR_VERSION
 
-FROM python:3.9.0rc1-alpine3.12
+FROM kiwigrid/k8s-sidecar:${KIWIGRID_SIDECAR_VERSION} as builder
+
+FROM python:3.9.0-alpine3.12
+
+ARG KIWIGRID_SIDECAR_VERSION
 
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-RUN echo "kubernetes==10.0.0" >> requirements.txt
-RUN echo "requests==2.22.0" >> requirements.txt
+RUN wget https://raw.githubusercontent.com/kiwigrid/k8s-sidecar/${KIWIGRID_SIDECAR_VERSION}/requirements.txt
 
 COPY --from=builder /app/* /app/
 RUN apk --no-cache upgrade && \
     apk --no-cache add gcc && \
-	pip install -r requirements.txt && \
-	apk del -r gcc && \
+    pip install -r requirements.txt && \
+    apk del -r gcc && \
     rm -rf /var/cache/apk/* requirements.txt
 
 USER 65534:65534

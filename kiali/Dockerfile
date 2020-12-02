@@ -1,4 +1,6 @@
-FROM quay.io/kiali/kiali:v1.26.0 as builder
+ARG KIALI_VERSION
+
+FROM quay.io/kiali/kiali:v${KIALI_VERSION} as builder
 
 FROM alpine:3.12
 

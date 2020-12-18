@@ -1,4 +1,4 @@
-FROM debian:testing-20201209-slim as builder
+FROM debian:testing-20201012-slim as builder
 
 # Fluent Bit version
 ENV FLB_VERSION 1.5.7
@@ -16,6 +16,7 @@ RUN apt-get update && \
       libasl-dev \
       libsasl2-dev \
       pkg-config \
+      libjemalloc-dev \
       libsystemd-dev \
       zlib1g-dev \
       ca-certificates \
@@ -27,15 +28,8 @@ RUN mkdir -p /fluent-bit/bin /fluent-bit/etc /fluent-bit/log /tmp/src/
 RUN curl -sSL https://github.com/fluent/fluent-bit/archive/v${FLB_VERSION}.tar.gz | \
     tar zx --strip=1 -C /tmp/src/
 
-# Non blocking writes patch
-COPY patch/non-blocking-write/* /patch/
-RUN mv /patch/flb_output.h /tmp/src/include/fluent-bit/
-RUN mv /patch/flb_pipe.h /tmp/src/include/fluent-bit/
-RUN mv /patch/flb_engine.c /tmp/src/src/
-RUN mv /patch/flb_pipe.c /tmp/src/src/
-# End non blocking writes patch
 
-RUN rm -rf /tmp/src/build/*
+# RUN rm -rf /tmp/src/build/*
 
 WORKDIR /tmp/src/build/
 RUN cmake -DFLB_DEBUG=Off \
@@ -52,6 +46,18 @@ RUN cmake -DFLB_DEBUG=Off \
 RUN make -j $(getconf _NPROCESSORS_ONLN)
 RUN install bin/fluent-bit /fluent-bit/bin/
 
+# Add sequentialhttp
+RUN rm -rf /plugin
+WORKDIR /tmp/src
+RUN curl -LO  https://github.com/mr-ma/fluent-bit-out-http-sequential/archive/plugin-out-sequentialhttp.zip
+RUN unzip plugin-out-sequentialhttp.zip
+
+RUN mkdir -p fluent-bit-out-http-sequential-plugin-out-sequentialhttp/plugin/build/
+WORKDIR /tmp/src/fluent-bit-out-http-sequential-plugin-out-sequentialhttp/plugin/build/
+RUN cmake -DFLB_SOURCE=/tmp/src -DPLUGIN_NAME=out_sequentialhttp  ../
+RUN make -j $(getconf _NPROCESSORS_ONLN)
+# End sequentialhttp
+
 # Configuration files
 WORKDIR /tmp/src/
 RUN mkdir /fluent-bit/lib
@@ -65,6 +71,18 @@ RUN cp conf/fluent-bit.conf \
        /fluent-bit/etc/
 
 
+FROM debian:testing-20201012-slim
+
+RUN apt-get update && \
+    apt-get -y dist-upgrade && \
+    apt-get install -y --no-install-recommends \
+        libsasl2-2 \
+        libssl1.1 \
+        ca-certificates && \
+    rm -rf /var/lib/apt/lists
+
+COPY --from=builder /fluent-bit /fluent-bit
+
 FROM golang:1.13 as lokibuilder
 
 ENV LOKI_VERSION 1.5.0
@@ -76,7 +94,7 @@ WORKDIR /tmp/src
 RUN make clean && make BUILD_IN_CONTAINER=false fluent-bit-plugin 
 RUN cp /tmp/src/cmd/fluent-bit/out_loki.so /loki
 
-FROM debian:testing-20201209-slim
+FROM debian:testing-20201117-slim
 
 RUN apt-get update && \
     apt-get -y dist-upgrade && \
@@ -87,10 +105,9 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists
 
 COPY --from=builder /fluent-bit /fluent-bit
+COPY --from=builder /tmp/src/fluent-bit-out-http-sequential-plugin-out-sequentialhttp/plugin /plugin
 COPY --from=lokibuilder /loki/out_loki.so /fluent-bit/lib
 
 EXPOSE 2020
 
-LABEL source=git@github.com:kyma-project/kyma.git
-
-CMD ["/fluent-bit/bin/fluent-bit", "-e", "/fluent-bit/lib/out_loki.so", "-c", "/fluent-bit/etc/fluent-bit.conf"]
+CMD ["/fluent-bit/bin/fluent-bit", "-e", "/plugin/build/flb-out_sequentialhttp.so", "-e", "/fluent-bit/lib/out_loki.so", "-c", "/fluent-bit/etc/fluent-bit.conf"]

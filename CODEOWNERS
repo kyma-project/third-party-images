@@ -9,13 +9,13 @@
 * @a-thaler @hisarbalik @lilitgh @suleymanakbas91 @clebs @rakesh-garimella
 
 # The `docker-registry` repo
-/docker-registry/ @michal-hudy @m00g3n @aerfio @magicmatatjahu
+/docker-registry/ @m00g3n @aerfio @pPrecel @dbadura @tgorgol @kfurgol
 
 # The `minio` repo
-/minio/ @michal-hudy @m00g3n @aerfio @magicmatatjahu
+/minio/ @m00g3n @aerfio @pPrecel @dbadura @tgorgol @kfurgol
 
 # The `minio client` repo
-/minio-mc/ @michal-hudy @m00g3n @aerfio @magicmatatjahu
+/minio-mc/ @m00g3n @aerfio @pPrecel @dbadura @tgorgol @kfurgol
 
 # All .md files
 *.md @bszwarc @majakurcius @tomekpapiernik @kazydek @klaudiagrz @alexandra-simeonova @mmitoraj

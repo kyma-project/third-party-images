@@ -1,4 +1,4 @@
-FROM debian:testing-20201012-slim as builder
+FROM debian:testing-20201209-slim as builder
 
 # Fluent Bit version
 ENV FLB_VERSION 1.5.7
@@ -29,7 +29,16 @@ RUN curl -sSL https://github.com/fluent/fluent-bit/archive/v${FLB_VERSION}.tar.g
     tar zx --strip=1 -C /tmp/src/
 
 
-# RUN rm -rf /tmp/src/build/*
+# Non blocking writes patch	
+COPY patch/non-blocking-write/* /patch/	
+RUN mv /patch/flb_output.h /tmp/src/include/fluent-bit/	
+RUN mv /patch/flb_pipe.h /tmp/src/include/fluent-bit/	
+RUN mv /patch/flb_engine.c /tmp/src/src/	
+RUN mv /patch/flb_pipe.c /tmp/src/src/	
+# End non blocking writes patch	
+
+
+RUN rm -rf /tmp/src/build/*
 
 WORKDIR /tmp/src/build/
 RUN cmake -DFLB_DEBUG=Off \
@@ -94,7 +103,7 @@ WORKDIR /tmp/src
 RUN make clean && make BUILD_IN_CONTAINER=false fluent-bit-plugin 
 RUN cp /tmp/src/cmd/fluent-bit/out_loki.so /loki
 
-FROM debian:testing-20201117-slim
+FROM debian:testing-20201209-slim
 
 RUN apt-get update && \
     apt-get -y dist-upgrade && \
@@ -109,5 +118,7 @@ COPY --from=builder /tmp/src/fluent-bit-out-http-sequential-plugin-out-sequentia
 COPY --from=lokibuilder /loki/out_loki.so /fluent-bit/lib
 
 EXPOSE 2020
+
+LABEL source=git@github.com:kyma-project/kyma.git
 
 CMD ["/fluent-bit/bin/fluent-bit", "-e", "/plugin/build/flb-out_sequentialhttp.so", "-e", "/fluent-bit/lib/out_loki.so", "-c", "/fluent-bit/etc/fluent-bit.conf"]

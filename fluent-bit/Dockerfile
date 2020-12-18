@@ -80,18 +80,6 @@ RUN cp conf/fluent-bit.conf \
        /fluent-bit/etc/
 
 
-FROM debian:testing-20201012-slim
-
-RUN apt-get update && \
-    apt-get -y dist-upgrade && \
-    apt-get install -y --no-install-recommends \
-        libsasl2-2 \
-        libssl1.1 \
-        ca-certificates && \
-    rm -rf /var/lib/apt/lists
-
-COPY --from=builder /fluent-bit /fluent-bit
-
 FROM golang:1.13 as lokibuilder
 
 ENV LOKI_VERSION 1.5.0

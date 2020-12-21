@@ -4,7 +4,8 @@ FROM alpine:3.12.3
 
 RUN set -ex \
     && apk --no-cache upgrade \
-    && apk add --no-cache ca-certificates apache2-utils
+    && apk add --no-cache ca-certificates apache2-utils \
+    && rm -rf /var/cache/apk/*
 
 COPY --from=builder /bin/registry /bin/registry
 COPY --from=builder /etc/docker/registry/config.yml /etc/docker/registry/config.yml

@@ -17,8 +17,7 @@ COPY --from=builder /usr/bin/docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
 RUN  \
     apk update && apk upgrade \
     apk add --no-cache ca-certificates curl 'su-exec>=0.2' && \
-    echo 'hosts: files mdns4_minimal [NOTFOUND=return] dns mdns4' >> /etc/nsswitch.conf && \
-    rm -rf /var/cache/apk/*
+    echo 'hosts: files mdns4_minimal [NOTFOUND=return] dns mdns4' >> /etc/nsswitch.conf
 
 ENTRYPOINT ["/usr/bin/docker-entrypoint.sh"]
 

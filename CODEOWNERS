@@ -17,5 +17,8 @@
 # The `minio client` repo
 /minio-mc/ @m00g3n @aerfio @pPrecel @dbadura @tgorgol @kfurgol
 
+# The `cloudsql-proxy` repo
+/cloudsql-proxy/ @piotrmiskiewicz @polskikiel @ksputo @jasiu001 @adamwalach @crabtree @kjaksik
+
 # All .md files
 *.md @majakurcius @kazydek @klaudiagrz @alexandra-simeonova @mmitoraj

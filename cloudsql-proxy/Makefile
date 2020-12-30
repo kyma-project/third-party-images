@@ -1,4 +1,3 @@
-
 APP_NAME ?= cloudsql-docker/gce-proxy
 VERSION = v1.19.1-alpine
 TAG = $(VERSION)-$(DOCKER_TAG)

@@ -4,7 +4,8 @@ FROM alpine:3.12.3
 
 LABEL source=git@github.com:kyma-project/kyma.git
 
-RUN apk add --no-cache \ 
+RUN apk update && apk upgrade \
+    apk add --no-cache \ 
     ca-certificates \
     libc6-compat
 

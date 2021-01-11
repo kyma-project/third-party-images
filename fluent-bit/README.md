@@ -1,40 +1,18 @@
 # Fluent Bit Docker Image
 
-This image is based on the official [Fluent Bit Docker image](https://github.com/fluent/fluent-bit-docker-image).
+This image is based on the official [Fluent Bit Docker Image](https://github.com/fluent/fluent-bit-docker-image).
 
 Changes are made to be based on on the latest debian:testing-slim in contrast to distroless, that is always debian:stable based.
 
-It contains Fluent Bit and the plugin for Loki.
+The custom plugin pugin has following customizations:
+* loki output plugin
+* sequential http output plugin
 
-# fluent-bit-out-http-sequential-plugin
-A plugin for `fluent-bit` to get `out-http` to submit long chunks sequentially . This code has been contributed by [Mohsen](https://github.com/mr-ma).
+## Sequential HTTP Output Plugin
+The standard HTTP output plugin `out-http` sends out records in batch. This is a problem for some consuming services in SKR environent (e.g. SAP Audit Management) 
+The `out-sequentialhttp` is a drop-in replacement that sends out records sequentially (one-by-one).
 
-# Utilize out_sequentialhttp plugin for submitting requests sequentially 
-## Create a docker file with the out_sequentialhttp plugin in it
-Make sure you are on the `plugin-out-sequentialhttp` branch
-
-A sample docker file is provided in the root of the repository. Build the stock image:
-
-```docker build . -t plugin-fluent-bit-image```
-
-Note that we supply the plugin via `-e` flag in the Dockerfile:
-
-```
-CMD ["/fluent-bit/bin/fluent-bit", "-e", "/plugin/build/flb-out_sequentialhttp.so","-c", "/fluent-bit/etc/fluent-bit.conf"]
-```
-
-It is possible to supply plugins via `-p pluging.conf`, too:
-
-```
-[PLUGINS]
-    Path /plugin/out_sequentialhttp/build/out_sequentialhttp.so
-```
-
-## Sample set up
-Let us use a mock server for the sake of this demonstration.
-
-### Fluentbit Configuration
-
+### Example Configuration
 ```
 [SERVICE]
     Flush         3
@@ -63,38 +41,4 @@ Let us use a mock server for the sake of this demonstration.
     Format           json_stream
     tls              on
     tls.verify       off
-```
-
-
-### Mockserver configuration
-
-Here is the content of `initializer.json`:
-
-```
-[
-  {
-    "httpRequest": {
-      "path": "/audit-log"
-    },
-    "httpResponse": {
-      "statusCode": 201,
-      "body": "some response"
-    }
-  }
-]
-```
-
-Content for `mockserver.properties`:
-```
-mockserver.initializationJsonPath="/config/initializer.json"
-```
-
-## Sample execution
-```
-docker network create logging
-
-docker run --rm -it --name fluent --network logging --mount type=bind,source="$(pwd)",target="/fluent-bit/etc" docker.io/library/plugin-fluent-bit-image
-
-docker run --rm --name mock --network logging -ti --mount type=bind,source="$(pwd)",target="/config" -p 8081:1080  mockserver/mockserver -serverPort 8081
-
 ```

@@ -12,10 +12,10 @@ The custom plugin pugin has following customizations:
 The standard HTTP output plugin `out-http` sends out records in batch. This is a problem for some consuming services in SKR environent (e.g. SAP Audit Service) 
 The `out-sequentialhttp` is a drop-in replacement that sends out records sequentially (one-by-one).
 
-## Code Modifications
+### Code Modifications
 The code of `out-sequentialhttp` is almost identical to `out-http`. The only difference is how msgpack to JSON transcoding / sending to the HTTP backend is done in the `cb_http_flush` function.  
 
-## Functional Testing
+### Functional Testing
 
 You can test the `out-sequentialhttp` plugin on an SKR cluster by deploying a mock HTTP server and making the `sequentialhttp` plugin send the logs to the mock.
 
@@ -51,7 +51,7 @@ kubectl create -f https://raw.githubusercontent.com/istio/istio/master/samples/h
 
 5. Edit the fluentbit configuration (`logging-fluent-bit-config` configmap) and replace `sequentialhttp` with `http` (the old plugin). Restart the pod you observed in the previous step. Check the logs. You should see log entries produced by `http` and the requests will contain batched log entries. 
 
-## Load Testing
+### Load Testing
 Edit the fluentbit configuration (`logging-fluent-bit-config` configmap) to send dummy audit logs at high rate by replacing the existing `tail` plugin with the following `dummy` plugin:
 ```
     [INPUT]

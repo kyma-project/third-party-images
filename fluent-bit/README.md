@@ -29,7 +29,7 @@ The code of `out-sequentialhttp` is almost identical to `out-http`. The only dif
     Name              dummy
     Tag               *
     Rate              1
-    Dummy             {"log":"level-info","msg":"succesful", "username":"username", "email":"email@email.com", "time":"2020-11-25T12:37:22Z"}
+    Dummy             {"log":"{\"level\":\"info\",\"msg\":\"login successful: connector xsuaa\", \"us    ername\":\"john.doe@sap.com\", \"preferred_username\":\"\", \"email\":\"john.doe@sap.com\", \"groups\":[\"tenantID=56b23cc1-d021-4344-9c24-bace8883b864\"],\"time\":\"2021-01-11T10:29:31Z\"}"}
 
 [OUTPUT]
     Name             sequentialhttp

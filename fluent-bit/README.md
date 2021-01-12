@@ -9,7 +9,7 @@ The custom plugin pugin has following customizations:
 * sequential http output plugin
 
 ## Sequential HTTP Output Plugin
-The standard HTTP output plugin `out-http` sends out records in batch. This is a problem for some consuming services in SKR environent (e.g. SAP Audit Service) 
+The standard HTTP output plugin `out-http` sends out records in batch. This is a problem for some consuming services in SKR environment (e.g. SAP Audit Service) 
 The `out-sequentialhttp` is a drop-in replacement that sends out records sequentially (one-by-one).
 
 ### Code Modifications

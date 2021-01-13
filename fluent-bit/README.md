@@ -18,9 +18,9 @@ The `out-sequentialhttp` is a drop-in replacement that sends out records sequent
 
 The code of `out-sequentialhttp` is almost identical to `out-http`. The only difference is how msgpack to JSON transcoding/sending to the HTTP backend is done in the `cb_http_flush` function.  
 
-### Functional Testing
+### Functional testing
 
-You can test the `out-sequentialhttp` plugin on an SKR cluster by deploying a mock HTTP server and making the `sequentialhttp` plugin send the logs to the mock.
+To test the `out-sequentialhttp` plugin on an SKR cluster, deploy a mock HTTP server, and make the `sequentialhttp` plugin send the logs to the mock.
 
 1. Deploy a mock server in the `kyma-system` namespace:
 ```

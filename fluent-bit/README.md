@@ -52,13 +52,7 @@ An example configuration looks as follows:
 
 3. Edit the fluentbit daemonset to make it use a custom image: `eu.gcr.io/kyma-project/incubator/pr/fluent-bit:1.5.7-PR-48`
 
-4. Make Dex generate logs. For example, log into the Kyma Console multiple times. Then, check the logs of the `fluentbit` Pod which runs on the same Node with Dex, and look for the log entries produced by `sequentialhttp`. 
-
-```bash
-kubectl logs fluentbit
-```
-
-Make sure that every requests delivers exactly one log entry.
+4. Make Dex generate logs. For example, log into the Kyma Console multiple times. Then, check the logs of the `fluentbit` Pod which runs on the same Node with Dex, and look for the log entries produced by `sequentialhttp`. Make sure that every requests delivers exactly one log entry.
 
 5. Edit the `logging-fluent-bit-config` ConfigMap, and replace `sequentialhttp` with the old `http` plugin. Restart the Pod you observed in the previous step. Check the logs. Look for log entries produced by `http`. The requests now contain batched log entries. 
 

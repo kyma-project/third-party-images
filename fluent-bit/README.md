@@ -55,8 +55,9 @@ kubectl create -f https://raw.githubusercontent.com/istio/istio/master/samples/h
 
 5. Edit the `logging-fluent-bit-config` ConfigMap, and replace `sequentialhttp` with the old `http` plugin. Restart the Pod you observed in the previous step. Check the logs. Look for log entries produced by `http`. The requests now contain batched log entries. 
 
-### Load Testing
-Edit the fluentbit configuration (`logging-fluent-bit-config` configmap) to send dummy audit logs at high rate by replacing the existing `tail` plugin with the following `dummy` plugin:
+### Load testing
+
+To send dummy audit logs at high rate, edit the `logging-fluent-bit-config` ConfigMap, and replace the existing `tail` plugin with the following `dummy` plugin:
 ```
     [INPUT]
             Name              dummy

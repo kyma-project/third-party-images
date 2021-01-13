@@ -63,4 +63,4 @@ Edit the fluentbit configuration (`logging-fluent-bit-config` configmap) to send
             Rate              10
             Dummy             {"log":"{\"level\":\"info\",\"msg\":\"login successful: connector \"xsuaa\"\", \"username\":\"john.doe@sap.com\", \"preferred_username\":\"\", \"email\":\"john.doe@sap.com\", \"groups\":[\"tenantID=56b23cc1-d021-4344-9c24-bace8883b864\"],\"time\":\"2021-01-11T10:29:31Z\"}"}
 ```
-Observe memory usage of the pod in Grafana and make sure that memory consumption does not grow over time.
+Observe memory usage of the Pod in Grafana, and make sure that memory consumption does not grow over time.

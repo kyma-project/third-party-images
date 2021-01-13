@@ -23,7 +23,7 @@ The code of `out-sequentialhttp` is almost identical to `out-http`. The only dif
 To test the `out-sequentialhttp` plugin on an SKR cluster, deploy a mock HTTP server, and make the `sequentialhttp` plugin send the logs to the mock.
 
 1. Deploy a mock server in the `kyma-system` Namespace:
-```
+```bash
 kubectl create -f https://raw.githubusercontent.com/istio/istio/master/samples/httpbin/httpbin.yaml
 ```
 

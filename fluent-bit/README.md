@@ -4,9 +4,10 @@ This image is based on the official [Fluent Bit Docker Image](https://github.com
 
 We add modifications so that we use the latest `debian:testing-slim` variant, as opposed to the upstream distroless image, which is always `debian:stable`-based.
 
-The custom plugin pugin has following customizations:
-* loki output plugin
-* sequential http output plugin
+The custom plugin has the following customizations:
+
+* Loki output plugin
+* Sequential HTTP output plugin
 
 ## Sequential HTTP Output Plugin
 The standard HTTP output plugin `out-http` sends out records in batch. This is a problem for some consuming services in SKR environment (e.g. SAP Audit Service) 

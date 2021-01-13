@@ -52,7 +52,7 @@ kubectl create -f https://raw.githubusercontent.com/istio/istio/master/samples/h
 
 4. Make dex generate logs (for example by logging into Kyma console multiple times)Check the logs of the fluentbit pod which run on the same node with dex. You should see log entries produced by `sequentialhttp`. Ensure that every requests delivers exactly one log entry.
 
-5. Edit the fluentbit configuration (`logging-fluent-bit-config` configmap) and replace `sequentialhttp` with `http` (the old plugin). Restart the pod you observed in the previous step. Check the logs. You should see log entries produced by `http` and the requests will contain batched log entries. 
+5. Edit the `logging-fluent-bit-config` ConfigMap, and replace `sequentialhttp` with the old `http` plugin. Restart the Pod you observed in the previous step. Check the logs. Look for log entries produced by `http`. The requests now contain batched log entries. 
 
 ### Load Testing
 Edit the fluentbit configuration (`logging-fluent-bit-config` configmap) to send dummy audit logs at high rate by replacing the existing `tail` plugin with the following `dummy` plugin:

@@ -1,6 +1,6 @@
 # Fluent Bit Docker Image
 
-This image is based on the official [Fluent Bit Docker Image](https://github.com/fluent/fluent-bit-docker-image).
+This image is based on the official [Fluent Bit Docker image](https://github.com/fluent/fluent-bit-docker-image).
 
 We add modifications so that we use the latest `debian:testing-slim` variant, as opposed to the upstream distroless image, which is always `debian:stable`-based.
 

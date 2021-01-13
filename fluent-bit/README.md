@@ -27,7 +27,7 @@ To test the `out-sequentialhttp` plugin on an SKR cluster, deploy a mock HTTP se
 kubectl create -f https://raw.githubusercontent.com/istio/istio/master/samples/httpbin/httpbin.yaml
 ```
 
-2. Edit the fluentbit configuration (`logging-fluent-bit-config` configmap) to send dummy logs to the mock server by replacing the following plugins in the `extra.conf` section:
+2. Send dummy logs to the mock server. To do this, edit the `logging-fluent-bit-config` ConfigMap, and replace the following plugins in the `extra.conf` section:
 * `http` output plugin by the `sequentialhttp` plugin
 * `tail` input plugin by the `dummy` plugin in order to simulate sending audit log at a high rate (otherwise no batching would occur).
 ```

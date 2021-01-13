@@ -20,5 +20,8 @@
 # The `cloudsql-proxy` repo
 /cloudsql-proxy/ @piotrmiskiewicz @polskikiel @ksputo @jasiu001 @adamwalach @crabtree @kjaksik
 
+# The `k8s-tools` repo
+/k8s-tools/ @adamwalach @Ressetkk @Halamix2 @dekiel @tehcyx @kasiakepka
+
 # All .md files
 *.md @majakurcius @kazydek @klaudiagrz @alexandra-simeonova @mmitoraj

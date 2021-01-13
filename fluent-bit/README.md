@@ -2,7 +2,7 @@
 
 This image is based on the official [Fluent Bit Docker Image](https://github.com/fluent/fluent-bit-docker-image).
 
-Changes are made to be based on on the latest debian:testing-slim in contrast to distroless, that is always debian:stable based.
+We add modifications so that we use the latest `debian:testing-slim` variant, as opposed to the upstream distroless image, which is always `debian:stable`-based.
 
 The custom plugin pugin has following customizations:
 * loki output plugin

@@ -29,9 +29,9 @@ kubectl create -f https://raw.githubusercontent.com/istio/istio/master/samples/h
 
 2. Send dummy logs to the mock server. To do this, edit the `logging-fluent-bit-config` ConfigMap, and replace the following plugins in the `extra.conf` section:
 * `http` output plugin → the `sequentialhttp` plugin
-* `tail` input plugin → the dummy plugin to simulate sending audit log at a high rate (otherwise no batching would occur)
+* `tail` input plugin → the `dummy plugin` to simulate sending audit log at a high rate (otherwise no batching would occur)
 
-Use this dummy plugin:
+An example configuration looks as follows:
 ```
       [INPUT]
               Name              dummy

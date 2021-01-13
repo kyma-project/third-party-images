@@ -14,7 +14,7 @@ The custom plugin has the following customizations:
 The standard HTTP output plugin `out-http` sends out records in batch. This is a problem for some consuming services in the SKR environment (e.g. SAP Audit Service) 
 The `out-sequentialhttp` is a drop-in replacement that sends out records sequentially (one-by-one).
 
-### Code Modifications
+### Code modifications
 
 The code of `out-sequentialhttp` is almost identical to `out-http`. The only difference is how msgpack to JSON transcoding/sending to the HTTP backend is done in the `cb_http_flush` function.  
 

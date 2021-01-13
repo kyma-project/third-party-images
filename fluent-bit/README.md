@@ -31,7 +31,7 @@ kubectl create -f https://raw.githubusercontent.com/istio/istio/master/samples/h
 * `http` output plugin → the `sequentialhttp` plugin
 * `tail` input plugin → the `dummy plugin` to simulate sending audit log at a high rate (otherwise no batching would occur)
 
-An example configuration looks as follows:
+An example Fluent Bit configuration looks as follows:
 ```
       [INPUT]
               Name              dummy
@@ -50,11 +50,13 @@ An example configuration looks as follows:
               tls              off
 ```
 
-3. Edit the fluentbit daemonset to make it use a custom image: `eu.gcr.io/kyma-project/incubator/pr/fluent-bit:1.5.7-PR-48`
+3. Make Dex generate logs. For example, log into the Kyma Console multiple times. Then, check the logs of the `fluent-bit` Pod which runs on the same Node with Dex, and look for the log entries produced by `sequentialhttp`. Make sure that every requests delivers exactly one log entry.
 
-4. Make Dex generate logs. For example, log into the Kyma Console multiple times. Then, check the logs of the `fluentbit` Pod which runs on the same Node with Dex, and look for the log entries produced by `sequentialhttp`. Make sure that every requests delivers exactly one log entry.
+```
+kubectl logs {FLUENT_BIT_POD_COLOCATED_WITH_DEX} fluent-bit
+```
 
-5. Edit the `logging-fluent-bit-config` ConfigMap, and replace `sequentialhttp` with the old `http` plugin. Restart the Pod you observed in the previous step. Check the logs. Look for log entries produced by `http`. The requests now contain batched log entries. 
+4. Edit the `logging-fluent-bit-config` ConfigMap, and replace `sequentialhttp` with the old `http` plugin. Restart the Pod you observed in the previous step. Check the logs. Look for log entries produced by `http`. The requests now contain batched log entries. 
 
 ### Load testing
 

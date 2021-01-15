@@ -18,7 +18,7 @@ The `out-sequentialhttp` is a drop-in replacement that sends out records sequent
 
 The code of `out-sequentialhttp` is almost identical to `out-http`. The only difference is how msgpack to JSON transcoding/sending to the HTTP backend is done in the `cb_http_flush` function.
 
->Note Even though the `out-sequentialhttp` plugin sends out logs one-by-one, retry is still done for the whole batch. If one HTTP request fails, then all of the logs in the respective batch will be resent.
+> **NOTE:** Even though the `out-sequentialhttp` plugin sends out logs one-by-one, retry is still done for the whole batch. If one HTTP request fails, then all of the logs in the respective batch will be re-sent.
 
 ### Functional testing
 

@@ -1,4 +1,4 @@
-FROM debian:testing-20210111-slim as builder
+FROM debian:buster as builder
 
 # Fluent Bit version
 ENV FLB_VERSION 1.5.7
@@ -88,15 +88,22 @@ WORKDIR /tmp/src
 RUN make clean && make BUILD_IN_CONTAINER=false fluent-bit-plugin 
 RUN cp /tmp/src/cmd/fluent-bit/out_loki.so /loki
 
-FROM debian:testing-20210111-slim
+FROM gcr.io/distroless/cc-debian10
 
-RUN apt-get update && \
-    apt-get -y dist-upgrade && \
-    apt-get install -y --no-install-recommends \
-    libsasl2-2 \
-    libssl1.1 \
-    ca-certificates && \
-    rm -rf /var/lib/apt/lists
+COPY --from=builder /usr/lib/x86_64-linux-gnu/*sasl* /usr/lib/x86_64-linux-gnu/
+COPY --from=builder /usr/lib/x86_64-linux-gnu/libz* /usr/lib/x86_64-linux-gnu/
+COPY --from=builder /lib/x86_64-linux-gnu/libz* /lib/x86_64-linux-gnu/
+COPY --from=builder /usr/lib/x86_64-linux-gnu/libssl.so* /usr/lib/x86_64-linux-gnu/
+COPY --from=builder /usr/lib/x86_64-linux-gnu/libcrypto.so* /usr/lib/x86_64-linux-gnu/
+
+# These below are all needed for systemd
+COPY --from=builder /lib/x86_64-linux-gnu/libsystemd* /lib/x86_64-linux-gnu/
+COPY --from=builder /lib/x86_64-linux-gnu/libselinux.so* /lib/x86_64-linux-gnu/
+COPY --from=builder /lib/x86_64-linux-gnu/liblzma.so* /lib/x86_64-linux-gnu/
+COPY --from=builder /usr/lib/x86_64-linux-gnu/liblz4.so* /usr/lib/x86_64-linux-gnu/
+COPY --from=builder /lib/x86_64-linux-gnu/libgcrypt.so* /lib/x86_64-linux-gnu/
+COPY --from=builder /lib/x86_64-linux-gnu/libpcre.so* /lib/x86_64-linux-gnu/
+COPY --from=builder /lib/x86_64-linux-gnu/libgpg-error.so* /lib/x86_64-linux-gnu/
 
 COPY --from=builder /fluent-bit /fluent-bit
 COPY --from=builder /plugins /plugins

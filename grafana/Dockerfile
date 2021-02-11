@@ -17,7 +17,8 @@ ENV PATH=/usr/share/grafana/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bi
 
 WORKDIR $GF_PATHS_HOME
 
-RUN apk add --no-cache ca-certificates bash tzdata && \
+RUN apk --no-cache upgrade \
+    apk add --no-cache ca-certificates bash tzdata && \
     apk add --no-cache openssl musl-utils
 
 COPY --from=builder "$GF_PATHS_HOME" "$GF_PATHS_HOME"

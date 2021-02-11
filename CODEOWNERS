@@ -23,5 +23,9 @@
 # The `k8s-tools` repo
 /k8s-tools/ @adamwalach @Ressetkk @Halamix2 @dekiel @tehcyx @kasiakepka
 
+# The `console-nginx` repo
+/console-nginx/ @akucharska @dariadomagala @parostatkiem @Wawrzyn321
+
+
 # All .md files
 *.md @majakurcius @kazydek @klaudiagrz @alexandra-simeonova @mmitoraj

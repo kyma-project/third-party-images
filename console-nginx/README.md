@@ -1,3 +1,3 @@
 # Console Nginx
 
-This folder contains the non-root Nginx image that is based on the official [Nginx unprivileged](https://github.com/nginxinc/docker-nginx-unprivileged).
+This folder contains the Nginx image used to serve static microfrontend files for Console.

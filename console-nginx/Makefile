@@ -1,6 +1,5 @@
 APP_NAME ?= console-nginx
-NGINX_IMAGE_TAG= 1.19.6-alpine
-TAG = $(NGINX_IMAGE_TAG)-$(DOCKER_TAG)
+TAG = $(DOCKER_TAG)
 IMG = $(DOCKER_PUSH_REPOSITORY)$(DOCKER_PUSH_DIRECTORY)/$(APP_NAME):$(TAG)
 
 # Build the docker image

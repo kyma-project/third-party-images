@@ -4,6 +4,7 @@ LABEL source git@github.com:kyma-project/console.git
 
 RUN apk --no-cache upgrade &&\
     apk --no-cache add nginx=1.18.0-r13
+    
 RUN touch /var/run/nginx.pid && \
   chown -R nginx:nginx /var/run/nginx.pid
 

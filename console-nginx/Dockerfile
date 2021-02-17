@@ -1,6 +1,7 @@
 FROM alpine:3.13.1
 
 LABEL source git@github.com:kyma-project/console.git
+LABEL application nginx 
 
 RUN apk --no-cache upgrade &&\
     apk --no-cache add nginx=1.18.0-r13

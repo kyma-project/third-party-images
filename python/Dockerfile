@@ -29,6 +29,7 @@ RUN set -ex \
 	&& tar -xzC /usr/src/python --strip-components=1 -f python.tar.gz \
 	&& rm python.tar.gz \
 	\
+	&& apk --no-cache upgrade \
 	&& apk add --no-cache --virtual .build-deps  \
 		bluez-dev \
 		bzip2-dev \

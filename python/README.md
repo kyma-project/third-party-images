@@ -1,3 +1,3 @@
-# python
+# Python
 
-This image contains python-alpine image built from github sources. It was based on <https://hub.docker.com/_/python>.
+This folder contains the `python-alpine` image built from GitHub sources. It is based on `https://hub.docker.com/_/python`.

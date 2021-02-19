@@ -26,6 +26,8 @@
 # The `console-nginx` repo
 /console-nginx/ @akucharska @dariadomagala @parostatkiem @Wawrzyn321
 
+# The `python` repo
+/python/ @m00g3n @aerfio @pPrecel @dbadura @tgorgol @kfurgol
 
 # All .md files
 *.md @majakurcius @kazydek @klaudiagrz @alexandra-simeonova @mmitoraj

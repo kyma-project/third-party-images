@@ -19,6 +19,7 @@ ENV GPG_KEY E3FF2839C048B25C084DEBE9B26995E310250568
 ENV PYTHON_VERSION 3.8.8
 
 RUN set -ex \
+	&& apk --no-cache upgrade \
 	&& apk add --no-cache --virtual .fetch-deps \
 		gnupg \
 		tar \
@@ -29,7 +30,6 @@ RUN set -ex \
 	&& tar -xzC /usr/src/python --strip-components=1 -f python.tar.gz \
 	&& rm python.tar.gz \
 	\
-	&& apk --no-cache upgrade \
 	&& apk add --no-cache --virtual .build-deps  \
 		bluez-dev \
 		bzip2-dev \

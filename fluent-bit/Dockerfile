@@ -76,17 +76,16 @@ RUN cp conf/fluent-bit.conf \
     conf/plugins.conf \
     /fluent-bit/etc/
 
+FROM golang:1.15 as lokibuilder
 
-FROM golang:1.13 as lokibuilder
-
-ENV LOKI_VERSION 1.5.0
+ENV LOKI_VERSION 2.1.0
 
 RUN mkdir -p /tmp/src /loki
 RUN curl -L https://github.com/grafana/loki/archive/v${LOKI_VERSION}.tar.gz | \
     tar zx --strip=1 -C /tmp/src/
 WORKDIR /tmp/src
 RUN make clean && make BUILD_IN_CONTAINER=false fluent-bit-plugin 
-RUN cp /tmp/src/cmd/fluent-bit/out_loki.so /loki
+RUN cp /tmp/src/cmd/fluent-bit/out_grafana_loki.so /loki
 
 FROM debian:testing-20210208-slim
 
@@ -100,10 +99,10 @@ RUN apt-get update && \
 
 COPY --from=builder /fluent-bit /fluent-bit
 COPY --from=builder /plugins /plugins
-COPY --from=lokibuilder /loki/out_loki.so /fluent-bit/lib
+COPY --from=lokibuilder /loki/out_grafana_loki.so /fluent-bit/lib
 
 EXPOSE 2020
 
 LABEL source=git@github.com:kyma-project/kyma.git
+CMD ["/fluent-bit/bin/fluent-bit", "-e", "/plugins/build/flb-out_sequentialhttp.so", "-e", "/fluent-bit/lib/out_grafana_loki.so", "-c", "/fluent-bit/etc/fluent-bit.conf"]
 
-CMD ["/fluent-bit/bin/fluent-bit", "-e", "/plugins/build/flb-out_sequentialhttp.so", "-e", "/fluent-bit/lib/out_loki.so", "-c", "/fluent-bit/etc/fluent-bit.conf"]

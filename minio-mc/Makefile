@@ -17,8 +17,8 @@ docker-push:
 .PHONY: ci-pr
 ci-pr: docker-build docker-push
 
-.PHONY: ci-master
-ci-master: docker-build docker-push
+.PHONY: ci-main
+ci-main: docker-build docker-push
 
 .PHONY: ci-release
 ci-release: docker-build docker-push

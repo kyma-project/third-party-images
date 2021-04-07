@@ -1,7 +1,6 @@
 # k8s-tools
 
-This image contains the following Kubernetes tools:
-- kubectl
+This image contains kubectl.
 
 It is used in many Helm charts in Kyma, mostly as an init container.
 

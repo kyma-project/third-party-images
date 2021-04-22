@@ -2,23 +2,12 @@ APP_NAME ?= k8s-sidecar
 KIWIGRID_SIDECAR_VERSION = 1.10.6
 TAG = $(KIWIGRID_SIDECAR_VERSION)-$(DOCKER_TAG)
 IMG = $(DOCKER_PUSH_REPOSITORY)$(DOCKER_PUSH_DIRECTORY)/$(APP_NAME):$(TAG)
+IMG_DEFAULT_TAG = $(DOCKER_PUSH_REPOSITORY)$(DOCKER_PUSH_DIRECTORY)/$(APP_NAME):$(DOCKER_TAG)
 
-# Build the docker image
-.PHONY: docker-build
+# Use generic makefile
+COMMON_DIR = $(realpath $(shell pwd)/../)/common
+include $(COMMON_DIR)/generic_makefile.mk
+
+# override docker-build
 docker-build:
 	docker build . -t ${IMG} --build-arg KIWIGRID_SIDECAR_VERSION=$(KIWIGRID_SIDECAR_VERSION)
-
-# Push the docker image
-.PHONY: docker-push
-docker-push:
-	docker push ${IMG}
-
-# CI specified targets
-.PHONY: ci-pr
-ci-pr: docker-build docker-push
-
-.PHONY: ci-main
-ci-main: docker-build docker-push
-
-.PHONY: ci-release
-ci-release: docker-build docker-push

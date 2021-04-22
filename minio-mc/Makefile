@@ -2,23 +2,8 @@ APP_NAME ?= minio/mc
 MINIOMC_VERSION = RELEASE.2019-04-03T17-59-57Z
 TAG = $(MINIOMC_VERSION)-$(DOCKER_TAG)
 IMG = $(DOCKER_PUSH_REPOSITORY)$(DOCKER_PUSH_DIRECTORY)/$(APP_NAME):$(TAG)
+IMG_DEFAULT_TAG = $(DOCKER_PUSH_REPOSITORY)$(DOCKER_PUSH_DIRECTORY)/$(APP_NAME):$(DOCKER_TAG)
 
-# Build the docker image
-.PHONY: docker-build
-docker-build:
-	docker build . -t ${IMG}
-
-# Push the docker image
-.PHONY: docker-push
-docker-push:
-	docker push ${IMG}
-
-# CI specified targets
-.PHONY: ci-pr
-ci-pr: docker-build docker-push
-
-.PHONY: ci-main
-ci-main: docker-build docker-push
-
-.PHONY: ci-release
-ci-release: docker-build docker-push
+# Use generic makefile
+COMMON_DIR = $(realpath $(shell pwd)/../)/common
+include $(COMMON_DIR)/generic_makefile.mk

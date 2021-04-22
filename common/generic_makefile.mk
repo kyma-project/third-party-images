@@ -1,7 +1,7 @@
 # Generic makefile - contains most used targets
 # Required variables:
 # IMG - name of the image, with docker push repository, full path and tag
-# IMG_DEFAULT_TAG - name of the image, with docker push repository, full path and DOCKER_TAG to satisfy Protescan requirements
+# IMG_DOCKER_TAG - name of the image, with docker push repository, full path and DOCKER_TAG to satisfy Protescan requirements
 
 
 # Build the docker image
@@ -13,12 +13,12 @@ docker-build:
 .PHONY: docker-push
 docker-push:
 	docker push ${IMG}
-	docker push ${IMG_DEFAULT_TAG}
+	docker push ${IMG_DOCKER_TAG}
 
 # add second tag to the image
 .PHONY: ci-tag
 ci-tag:
-	docker tag ${IMG} ${IMG_DEFAULT_TAG}
+	docker tag ${IMG} ${IMG_DOCKER_TAG}
 
 # CI specified targets
 .PHONY: ci-pr

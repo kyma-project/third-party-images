@@ -16,7 +16,8 @@ COPY --from=builder /usr/bin/docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
 
 RUN  \
     apk update && apk upgrade && \
-    apk add --no-cache ca-certificates curl 'su-exec>=0.2' && \
+    apk add --no-cache ca-certificates 'su-exec>=0.2' && \
+    apk add --no-cache curl>=7.76.0-r0 --repository=http://dl-cdn.alpinelinux.org/alpine/edge/main && \
     echo 'hosts: files mdns4_minimal [NOTFOUND=return] dns mdns4' >> /etc/nsswitch.conf
 
 ENTRYPOINT ["/usr/bin/docker-entrypoint.sh"]

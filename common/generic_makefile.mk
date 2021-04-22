@@ -1,5 +1,5 @@
-# Genric makefile
-# Requiured variables:
+# Generic makefile - contains most used targets
+# Required variables:
 # IMG - name of the image, with docker push repository, full path and tag
 # IMG_DEFAULT_TAG - name of the image, with docker push repository, full path and DOCKER_TAG to satisfy Protescan requirements
 

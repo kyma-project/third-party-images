@@ -12,7 +12,8 @@ docker-build:
 # Push the docker image
 .PHONY: docker-push
 docker-push:
-	docker push ${IMG} ${IMG_DEFAULT_TAG}
+	docker push ${IMG}
+	docker push ${IMG_DEFAULT_TAG}
 
 # add second tag to the image
 .PHONY: ci-tag

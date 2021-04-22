@@ -1,4 +1,4 @@
-FROM alpine:3.13.1
+FROM alpine:3.13.5
 
 LABEL source git@github.com:kyma-project/console.git
 LABEL application nginx 

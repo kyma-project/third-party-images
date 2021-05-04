@@ -2,6 +2,7 @@ FROM alpine:3.13.5
 
 # Commit details
 
+
 ARG commit
 ENV IMAGE_COMMIT=$commit
 LABEL io.kyma-project.third-party-images.commit=$commit

@@ -18,7 +18,10 @@
 /minio-mc/ @m00g3n @aerfio @pPrecel @dbadura @tgorgol @kfurgol
 
 # The `cloudsql-proxy` repo
-/cloudsql-proxy/ @piotrmiskiewicz @polskikiel @ksputo @jasiu001 @adamwalach @crabtree @kjaksik
+/cloudsql-proxy/ @piotrmiskiewicz @ksputo @jasiu001 @crabtree
+
+# The `etcd` repo
+/etcd/ @piotrmiskiewicz @ksputo @jasiu001 @crabtree
 
 # The `k8s-tools` repo
 /k8s-tools/ @adamwalach @Ressetkk @Halamix2 @dekiel @tehcyx @kasiakepka

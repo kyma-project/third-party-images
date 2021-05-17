@@ -17,6 +17,6 @@ RUN echo 'hosts: files mdns4_minimal [NOTFOUND=return] dns mdns4' >> /etc/nsswit
 
 EXPOSE 2379 2380
 
-COPY --from=builder --chown=nonroot /usr/local/bin/ /usr/local/bin/
+COPY --from=builder /usr/local/bin/ /usr/local/bin/
 
 CMD ["/usr/local/bin/etcd"]

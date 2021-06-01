@@ -17,3 +17,4 @@ RUN apk --no-cache upgrade &&\
     chmod +x /usr/local/bin/kubectl
 
 ENTRYPOINT ["/bin/bash"]
+#test

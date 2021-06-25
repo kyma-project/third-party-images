@@ -15,7 +15,7 @@ COPY --from=builder $KIALI_HOME/console/ $KIALI_HOME/console/
 RUN apk --no-cache upgrade \
  && apk add --no-cache bash
 
-RUN adduser --uid 1000 kiali && \
+RUN adduser -D -u 1000 kiali && \
     chown -R kiali:kiali $KIALI_HOME/console && \
     chmod -R g=u $KIALI_HOME/console
 

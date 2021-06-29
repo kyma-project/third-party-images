@@ -4,7 +4,7 @@ This image is based on the official [Fluent Bit Docker image](https://github.com
 
 We add modifications so that we use the latest `debian:testing-slim` variant, as opposed to the upstream distroless image, which is always `debian:stable`-based.
 
-The custom plugin has the following customizations:
+The custom plugin has the following customizations: 
 
 * Loki output plugin
 * Sequential HTTP output plugin

@@ -95,10 +95,10 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists
 
 COPY --from=builder /fluent-bit /fluent-bit
-COPY --from=builder /plugins/build/flb-out_sequentialhttp.so /plugins
+COPY --from=builder /plugins/build/flb-out_sequentialhttp.so /fluent-bit/lib
 COPY --from=lokibuilder /loki/out_grafana_loki.so /fluent-bit/lib
 
 EXPOSE 2020
 
 LABEL source=git@github.com:kyma-project/kyma.git
-CMD ["/fluent-bit/bin/fluent-bit", "-e", "/plugins/flb-out_sequentialhttp.so", "-e", "/fluent-bit/lib/out_grafana_loki.so", "-c", "/fluent-bit/etc/fluent-bit.conf"]
+CMD ["/fluent-bit/bin/fluent-bit", "-e", "/fluent-bit/lib/flb-out_sequentialhttp.so", "-e", "/fluent-bit/lib/out_grafana_loki.so", "-c", "/fluent-bit/etc/fluent-bit.conf"]

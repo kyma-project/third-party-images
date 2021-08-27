@@ -27,7 +27,6 @@ RUN mkdir -p /fluent-bit/bin /fluent-bit/etc /fluent-bit/log /tmp/src/
 RUN curl -sSL https://github.com/fluent/fluent-bit/archive/v${FLB_VERSION}.tar.gz | \
     tar zx --strip=1 -C /tmp/src/
 
-
 # Non blocking writes patch	
 COPY patch/non-blocking-write/* /patch/	
 RUN mv /patch/flb_output.h /tmp/src/include/fluent-bit/	

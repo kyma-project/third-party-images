@@ -1,7 +1,7 @@
 FROM debian:testing-20210816-slim as builder
 
 # Fluent Bit version
-ENV FLB_VERSION 1.8.3
+ENV FLB_VERSION 1.8.4
 
 ARG FLB_TARBALL=https://github.com/fluent/fluent-bit/archive/v$FLB_VERSION.tar.gz
 ENV FLB_SOURCE $FLB_TARBALL
@@ -10,6 +10,7 @@ RUN mkdir -p /fluent-bit/bin /fluent-bit/etc /fluent-bit/log /tmp/fluent-bit-mas
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && \
+    apt-get -y dist-upgrade && \
     apt-get install -y --no-install-recommends \
     build-essential \
     curl \
@@ -54,8 +55,8 @@ COPY plugins /plugins
 RUN mkdir -p /plugins/build/
 WORKDIR /plugins/build/
 RUN cmake -DFLB_SOURCE=/tmp/fluent-bit \
-          -DPLUGIN_NAME=out_sequentialhttp  ..
-#RUN make -j $(getconf _NPROCESSORS_ONLN)
+          -DPLUGIN_NAME=out_sequentialhttp  ../
+RUN make -j $(getconf _NPROCESSORS_ONLN)
 # End sequentialhttp
 
 # Configuration files
@@ -94,10 +95,10 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists
 
 COPY --from=builder /fluent-bit /fluent-bit
-
+COPY --from=builder /plugins /plugins/build/flb-out_sequentialhttp.so
 COPY --from=lokibuilder /loki/out_grafana_loki.so /fluent-bit/lib
 
 EXPOSE 2020
 
 LABEL source=git@github.com:kyma-project/kyma.git
-CMD ["/fluent-bit/bin/fluent-bit", "-e", "/fluent-bit/lib/out_grafana_loki.so", "-c", "/fluent-bit/etc/fluent-bit.conf"]
+CMD ["/fluent-bit/bin/fluent-bit", "-e", "/plugins/flb-out_sequentialhttp.so", "-e", "/fluent-bit/lib/out_grafana_loki.so", "-c", "/fluent-bit/etc/fluent-bit.conf"]

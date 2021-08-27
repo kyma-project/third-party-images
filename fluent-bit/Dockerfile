@@ -1,6 +1,5 @@
 FROM debian:testing-20210816-slim as builder
 
-# Fluent Bit version
 ENV FLB_VERSION 1.5.7
 ENV DEBIAN_FRONTEND noninteractive
 

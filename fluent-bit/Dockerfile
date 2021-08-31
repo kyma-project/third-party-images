@@ -22,6 +22,7 @@ RUN apt-get update && \
     libsasl2-dev \
     pkg-config \
     libjemalloc-dev \
+    libc-ares-dev \
     libsystemd-dev \
     zlib1g-dev \
     libpq-dev \

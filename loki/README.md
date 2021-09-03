@@ -1,4 +1,4 @@
-# Loki Docker Image 
+# Loki Docker Image
 
 The official Loki Docker image is [here](https://github.com/grafana/loki/blob/v2.2.1/cmd/loki/Dockerfile).
 

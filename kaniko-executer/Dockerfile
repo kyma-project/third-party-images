@@ -14,7 +14,10 @@
 
 # Builds the static Go image to execute in a Kubernetes job
 
-FROM golang:1.15
+FROM golang:1.15-alpine
+
+ARG KANIKO_VERSION
+
 ARG GOARCH=amd64
 WORKDIR /go/src/github.com/GoogleContainerTools/kaniko
 
@@ -26,13 +29,13 @@ ARG TARGETPLATFORM
 #Capture ARCH has write to /goarch
 RUN [ ! "x" = "x$TARGETPLATFORM" ] && `echo $TARGETPLATFORM |  awk '{split($0,a,"/"); print a[2]}' > /goarch` || echo "$GOARCH"
 
+RUN apk upgrade && apk add git make build-base bash
 # Get GCR credential helper
 RUN GOARCH=$(cat /goarch) && CGO_ENABLED=0 && \
   (mkdir -p /go/src/github.com/GoogleCloudPlatform || true)                  && \
   cd /go/src/github.com/GoogleCloudPlatform                                  && \
   git clone https://github.com/GoogleCloudPlatform/docker-credential-gcr.git && \
   cd /go/src/github.com/GoogleCloudPlatform/docker-credential-gcr            && \
-  make deps OUT_DIR=/usr/local/bin                                           && \
   go build -ldflags "-linkmode external -extldflags -static" -i -o /usr/local/bin/docker-credential-gcr main.go
 
 # Get Amazon ECR credential helper
@@ -49,8 +52,7 @@ RUN GOARCH=$(cat /goarch) && (mkdir -p /go/src/github.com/chrismellard || true) 
 # Add .docker config dir
 RUN mkdir -p /kaniko/.docker
 
-COPY . .
-RUN make GOARCH=$(cat /goarch.txt)
+RUN git clone --depth 1 --branch v$KANIKO_VERSION https://github.com/GoogleContainerTools/kaniko . && make GOARCH=$(cat /goarch)
 
 # Generate latest ca-certificates
 
@@ -68,7 +70,7 @@ COPY --from=0 /go/src/github.com/awslabs/amazon-ecr-credential-helper/bin/local/
 COPY --from=0 /go/src/github.com/chrismellard/docker-credential-acr-env/build/docker-credential-acr-env /kaniko/docker-credential-acr
 COPY --from=certs /ca-certificates.crt /kaniko/ssl/certs/
 COPY --from=0 /kaniko/.docker /kaniko/.docker
-COPY files/nsswitch.conf /etc/nsswitch.conf
+COPY --from=0 /go/src/github.com/GoogleContainerTools/kaniko/files/nsswitch.conf /etc/nsswitch.conf
 ENV HOME /root
 ENV USER root
 ENV PATH /usr/local/bin:/kaniko

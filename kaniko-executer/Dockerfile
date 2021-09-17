@@ -14,7 +14,8 @@
 
 # Builds the static Go image to execute in a Kubernetes job
 
-FROM golang:1.15-alpine
+# using alpine image is not feasible due to  https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.14.0#faccessat
+FROM golang:1.16-bullseye
 
 ARG KANIKO_VERSION
 
@@ -29,7 +30,7 @@ ARG TARGETPLATFORM
 #Capture ARCH has write to /goarch
 RUN [ ! "x" = "x$TARGETPLATFORM" ] && `echo $TARGETPLATFORM |  awk '{split($0,a,"/"); print a[2]}' > /goarch` || echo "$GOARCH"
 
-RUN apk upgrade && apk add git make build-base bash
+RUN apt update -q -y && apt dist-upgrade -y && apt install -q -y git build-essential 
 # Get GCR credential helper
 RUN GOARCH=$(cat /goarch) && CGO_ENABLED=0 && \
   (mkdir -p /go/src/github.com/GoogleCloudPlatform || true)                  && \
@@ -39,14 +40,14 @@ RUN GOARCH=$(cat /goarch) && CGO_ENABLED=0 && \
   go build -ldflags "-linkmode external -extldflags -static" -i -o /usr/local/bin/docker-credential-gcr main.go
 
 # Get Amazon ECR credential helper
-RUN GOARCH=$(cat /goarch) && go get -u github.com/awslabs/amazon-ecr-credential-helper/ecr-login/cli/docker-credential-ecr-login && \
+RUN GOARCH=$(cat /goarch) && GO111MODULE=off go get -u github.com/awslabs/amazon-ecr-credential-helper/ecr-login/cli/docker-credential-ecr-login && \
   make -C /go/src/github.com/awslabs/amazon-ecr-credential-helper
 
 # ACR docker env credential helper
 RUN GOARCH=$(cat /goarch) && (mkdir -p /go/src/github.com/chrismellard || true)   && \
-  cd /go/src/github.com/chrismellard                                              && \
-  git clone https://github.com/chrismellard/docker-credential-acr-env             && \
-  cd  docker-credential-acr-env                                                   && \
+  cd /go/src/github.com/chrismellard && \
+  git clone https://github.com/chrismellard/docker-credential-acr-env && \
+  cd docker-credential-acr-env && \
   make build
 
 # Add .docker config dir

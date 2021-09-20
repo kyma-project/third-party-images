@@ -24,7 +24,7 @@ WORKDIR /go/src/github.com/GoogleContainerTools/kaniko
 
 RUN echo $GOARCH > /goarch
 
-#This arg is passed by docker buildx & contains the platform info in the form linux/amd64, linux/ppc64le etc.
+#This arg is passed by docker buildx and contains the platform info in the form linux/amd64, linux/ppc64le etc.
 ARG TARGETPLATFORM
 
 #Capture ARCH has write to /goarch

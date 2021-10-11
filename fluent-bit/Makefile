@@ -8,6 +8,6 @@ IMG_DOCKER_TAG = $(DOCKER_PUSH_REPOSITORY)$(DOCKER_PUSH_DIRECTORY)/$(APP_NAME):$
 COMMON_DIR = $(realpath $(shell pwd)/../)/common
 include $(COMMON_DIR)/generic_makefile.mk
 
-# override docker-build
+# override docker-build 
 docker-build:
 	docker build . -t ${IMG} --build-arg FLB_VERSION=$(FLUENTBIT_VERSION)

@@ -20,14 +20,14 @@ RUN apt-get update && \
     libssl-dev \
     libsasl2-dev \
     pkg-config \
-    libjemalloc-dev \
-    libc-ares-dev \ 
     libsystemd-dev \
     zlib1g-dev \
     libpq-dev \
     postgresql-server-dev-all \
     flex \
     bison \
+    libjemalloc-dev \
+    libc-ares-dev \ 
     && curl -L -o "/tmp/fluent-bit.tar.gz" ${FLB_SOURCE} \
     && cd tmp/ && mkdir fluent-bit \
     && tar zxfv fluent-bit.tar.gz -C ./fluent-bit --strip-components=1 \
@@ -93,6 +93,8 @@ RUN apt-get update && \
     libssl1.1 \
     ca-certificates && \
     rm -rf /var/lib/apt/lists
+
+COPY --from=builder /usr/lib/x86_64-linux-gnu/libpq.so* /usr/lib/x86_64-linux-gnu/
 
 COPY --from=builder /fluent-bit /fluent-bit
 COPY --from=builder /plugins/build/flb-out_sequentialhttp.so /fluent-bit/lib

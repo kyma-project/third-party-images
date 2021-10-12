@@ -95,6 +95,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists
 
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libpq.so* /usr/lib/x86_64-linux-gnu/
+COPY --from=builder /usr/lib/x86_64-linux-gnu/libldap* /usr/lib/x86_64-linux-gnu/
 
 COPY --from=builder /fluent-bit /fluent-bit
 COPY --from=builder /plugins/build/flb-out_sequentialhttp.so /fluent-bit/lib

@@ -10,11 +10,5 @@ COMMON_DIR = $(realpath $(shell pwd)/../)/common
 include $(COMMON_DIR)/generic_makefile.mk
 
 # override docker-build
-docker-build: mod-verify-local test-local
-	docker build . -t ${IMG} --build-arg GRAFANA_VERSION=$(GRAFANA_VERSION)
-
-mod-verify-local:
-	GO111MODULE=on go mod verify
-
-test-local:
-	GO111MODULE=on go test ./...
+docker-build:
+	docker build . -t ${IMG} -build-arg GRAFANA_VERSION=$(GRAFANA_VERSION)

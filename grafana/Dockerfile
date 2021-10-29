@@ -59,13 +59,14 @@ COPY go.mod go.mod
 COPY go.sum go.sum
 
 RUN go mod download
+
 COPY main_test.go main_test.go
-RUN rm main_test.go
+COPY main.go main.go
 
 RUN go mod verify
 RUN go test ./...
 
-COPY main.go main.go
+RUN rm main_test.go
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o grafanawatcher main.go
 

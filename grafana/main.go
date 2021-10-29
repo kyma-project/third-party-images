@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"sync"
+	"syscall"
 
 	"github.com/fsnotify/fsnotify"
 	_ "github.com/pkg/errors"
@@ -16,6 +18,7 @@ const grafanaRun = "./run.sh"
 
 var (
 	logger *zap.SugaredLogger
+	mutex        sync.Mutex
 )
 
 type watcher interface {
@@ -81,7 +84,7 @@ func start(w watcher) error {
 			select {
 			case event := <-w.attributes().grafana.Events:
 				switch {
-				case event.Op&fsnotify.Create == fsnotify.Create || event.Op&fsnotify.Write == fsnotify.Write:
+				case event.Op&fsnotify.Create == fsnotify.Create:
 					if err := w.killProcess(); err != nil {
 						logger.Errorf("Error killing process: %s", err)
 					} else {
@@ -118,17 +121,15 @@ func (g *grafanaWatcher) startGrafana() error {
 }
 
 func (g *grafanaWatcher) killProcess() error {
-	psName := g.attributes().process
-	g.attr.cmd = exec.Command("pkill", psName)
-	g.attr.cmd.Stdout = os.Stdout
-	g.attr.cmd.Stderr = os.Stderr
-	if err := g.attr.cmd.Start(); err != nil {
-		logger.Error("error occurred in process shutdown:", err)
-		g.attr.cmd = nil
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	if err := g.attr.cmd.Process.Signal(syscall.SIGTERM); err != nil {
 		return err
+	} else {
+		logger.Info("Grafana successfully stopped")
+		return nil
 	}
-	logger.Info("Grafana successfully stopped")
-	return nil
 }
 
 func (g *grafanaWatcher) stop() error {

@@ -85,6 +85,7 @@ func start(w watcher) error {
 			case event := <-w.attributes().grafana.Events:
 				switch {
 				case event.Op&fsnotify.Create == fsnotify.Create:
+					logger.Infof("Datasource directory modified: %s", event.String())
 					if err := w.killProcess(); err != nil {
 						logger.Errorf("Error killing process: %s", err)
 					} else {
@@ -92,7 +93,6 @@ func start(w watcher) error {
 							logger.Errorf("Error restarting Grafana: %s", err)
 						}
 					}
-					logger.Infof("Datasource directory modified: %s", event.String())
 				}
 			case err := <-w.attributes().grafana.Errors:
 				fmt.Printf("Error %s", err)

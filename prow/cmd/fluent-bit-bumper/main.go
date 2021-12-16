@@ -21,8 +21,10 @@ import (
 	"github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
 	"io/ioutil"
-
 	"k8s.io/test-infra/prow/cmd/generic-autobumper/bumper"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"sigs.k8s.io/yaml"
 )
@@ -38,10 +40,42 @@ type client struct {
 // returns commit message for the changes
 func (c *client) Changes() []func() (string, error) {
 	return []func() (string, error){
-		func() (string, error) {
-			return "Bumping", nil
-		},
+		bumpDebianBaseImage,
+		bumpFluentBit,
 	}
+}
+
+func bumpDebianBaseImage() (string, error) {
+	newVersion := "debian:testing-20220101-slim"
+
+	if err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+		if strings.HasPrefix(path, "Dockerfile") {
+			return updateDockerfile(path, newVersion)
+		}
+		return nil
+	}); err != nil {
+		return "", fmt.Errorf("failed to bump debian base image: %v", err)
+	}
+
+	return fmt.Sprintf("Bump Debian base image %s", newVersion), nil
+}
+
+func updateDockerfile(path, newVersion string) error {
+	oldContent, err := ioutil.ReadFile(path)
+	if err != nil {
+		return fmt.Errorf("failed to read %s: %w", path, err)
+	}
+
+	newContent := strings.ReplaceAll(string(oldContent), "debian:testing-20211201-slim", newVersion)
+
+	if err := ioutil.WriteFile(path, []byte(newContent), 0644); err != nil {
+		return fmt.Errorf("failed to write %s: %w", path, err)
+	}
+	return nil
+}
+
+func bumpFluentBit() (string, error) {
+	return "", nil
 }
 
 // PRTitleBody returns the body of the PR, this function runs after each commit

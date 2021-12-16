@@ -39,7 +39,6 @@ type client struct {
 func (c *client) Changes() []func() (string, error) {
 	return []func() (string, error){
 		bumpDebianBaseImage,
-		bumpFluentBit,
 	}
 }
 
@@ -70,10 +69,6 @@ func updateDockerfile(path, newVersion string) error {
 		return fmt.Errorf("failed to write %s: %w", path, err)
 	}
 	return nil
-}
-
-func bumpFluentBit() (string, error) {
-	return "", nil
 }
 
 // PRTitleBody returns the body of the PR, this function runs after each commit

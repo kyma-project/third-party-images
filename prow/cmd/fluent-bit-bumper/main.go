@@ -46,7 +46,7 @@ func bumpDebianBaseImage() (string, error) {
 	newVersion := "debian:testing-20220101-slim"
 
 	if err := filepath.Walk("fluent-bit", func(path string, info os.FileInfo, err error) error {
-		if strings.HasPrefix(path, "Dockerfile") {
+		if strings.Contains(path, "Dockerfile") {
 			return updateDockerfile(path, newVersion)
 		}
 		return nil

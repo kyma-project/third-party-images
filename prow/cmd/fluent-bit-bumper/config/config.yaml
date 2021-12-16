@@ -1,0 +1,8 @@
+gitHubLogin: "kyma-bot"
+gitHubToken: "/etc/github/token"
+gitName: "Kyma Bot"
+gitEmail: "kyma.bot@sap.com"
+skipPullRequest: false
+gitHubOrg: "kyma-project"
+gitHubRepo: "third-party-images"
+remoteName: "third-party-images"

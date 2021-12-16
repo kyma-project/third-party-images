@@ -29,8 +29,6 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-var _ bumper.PRHandler = (*client)(nil)
-
 type client struct {
 	images   map[string]string
 	versions map[string][]string

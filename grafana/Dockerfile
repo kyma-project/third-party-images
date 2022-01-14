@@ -51,7 +51,7 @@ ENTRYPOINT [ "/run.sh" ]
 
 FROM eu.gcr.io/kyma-project/external/golang:1.17.6-alpine3.15 as go-builder
 
-RUN apk upgrade && apk add gcc build-base
+RUN apk upgrade && apk add gcc build-base bash
 ENV GO111MODULE=on
 
 WORKDIR /workspace

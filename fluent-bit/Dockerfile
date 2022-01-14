@@ -76,7 +76,7 @@ FROM eu.gcr.io/kyma-project/external/golang:1.17.6-alpine3.15 as lokibuilder
 
 # 2.2.x is the last version on Apache 2.0 license, please verify the license before upgrading further
 ENV LOKI_VERSION 2.2.1 
-RUN apk upgrade && apk add curl
+RUN apk upgrade && apk add curl make gcc
 RUN mkdir -p /tmp/src /loki
 RUN curl -L https://github.com/grafana/loki/archive/v${LOKI_VERSION}.tar.gz | \
     tar zx --strip=1 -C /tmp/src/

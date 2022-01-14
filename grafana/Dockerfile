@@ -49,7 +49,7 @@ COPY ./run.sh /run.sh
 USER "$GF_UID"
 ENTRYPOINT [ "/run.sh" ]
 
-FROM golang:1.17 as go-builder
+FROM eu.gcr.io/kyma-project/external/golang:1.17.6-alpine3.15 as go-builder
 
 ENV GO111MODULE=on
 

@@ -24,3 +24,4 @@ USER 65534:65534
 LABEL source=git@github.com:kyma-project/kyma.git
 
 CMD [ "python", "-u", "/app/sidecar.py" ]
+

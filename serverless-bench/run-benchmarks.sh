@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 
-# set -o errexit
 set -o pipefail  # Fail a pipe if any sub-command fails.
 
 
-ALL_FUNCTIONS=(nodejs14-xs nodejs14-s nodejs14-m nodejs14-l nodejs14-xl python39-xs python39-s python39-m python39-l python39-xl)
+ALL_FUNCTIONS=(nodejs14-xs nodejs14-s nodejs14-m nodejs14-l nodejs14-xl python39-s python39-m python39-l python39-xl)
 
 export TEST_NAMESPACE="${NAMESPACE:-serverless-benchmarks}"
-export TEST_CONCURRENCY=50
-export TEST_DURATION=1m
-export TEST_SPAWN_RATE=50
+export TEST_CONCURRENCY="${CONCURRENCY:-50}"
+export TEST_DURATION="${DURATION:-1m}"
+export TEST_SPAWN_RATE="${SPAWN_RATE:-50}"
 
 
 # running benshmarks

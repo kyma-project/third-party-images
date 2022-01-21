@@ -12,3 +12,4 @@ include $(COMMON_DIR)/generic_makefile.mk
 # override docker-build
 docker-build:
 	docker build . -t ${IMG} --build-arg GRAFANA_VERSION=$(GRAFANA_VERSION)
+

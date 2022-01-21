@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -o errexit
+# set -o errexit
 set -o pipefail  # Fail a pipe if any sub-command fails.
 
 

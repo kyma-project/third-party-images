@@ -17,6 +17,7 @@
 FROM eu.gcr.io/kyma-project/external/golang:1.17.6-alpine3.15 as builder
 
 ARG KANIKO_VERSION
+ARG KANIKO_GITEA_VERSION=v0.15.1
 ARG GOARCH=amd64
 WORKDIR /go/src/github.com/GoogleContainerTools/kaniko
 
@@ -39,7 +40,7 @@ RUN GOARCH=$(cat /goarch) && CGO_ENABLED=0 && \
 
 # Get Amazon ECR credential helper
 RUN GOARCH=$(cat /goarch) && GO111MODULE=off go get -u github.com/awslabs/amazon-ecr-credential-helper/ecr-login/cli/docker-credential-ecr-login && \
-  make -C /go/src/github.com/awslabs/amazon-ecr-credential-helper
+make -C /go/src/github.com/awslabs/amazon-ecr-credential-helper
 
 # ACR docker env credential helper
 RUN GOARCH=$(cat /goarch) && (mkdir -p /go/src/github.com/chrismellard || true)   && \
@@ -51,7 +52,10 @@ RUN GOARCH=$(cat /goarch) && (mkdir -p /go/src/github.com/chrismellard || true) 
 # Add .docker config dir
 RUN mkdir -p /kaniko/.docker
 
-RUN git clone --depth 1 --branch v$KANIKO_VERSION https://github.com/GoogleContainerTools/kaniko . && make GOARCH=$(cat /goarch)
+RUN git clone --depth 1 --branch v$KANIKO_VERSION https://github.com/GoogleContainerTools/kaniko . \
+  && go mod edit -replace code.gitea.io/sdk/gitea=code.gitea.io/sdk/gitea@v0.15.1 \
+  && go mod vendor \
+  && make GOARCH=$(cat /goarch)
 
 # Generate latest ca-certificates
 FROM debian:buster-slim AS certs

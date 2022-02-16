@@ -17,7 +17,6 @@
 FROM eu.gcr.io/kyma-project/external/golang:1.17.6-alpine3.15 as builder
 
 ARG KANIKO_VERSION
-ARG KANIKO_GITEA_VERSION=v0.15.1
 ARG GOARCH=amd64
 WORKDIR /go/src/github.com/GoogleContainerTools/kaniko
 

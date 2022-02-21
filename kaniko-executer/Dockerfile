@@ -53,6 +53,7 @@ RUN mkdir -p /kaniko/.docker
 
 RUN git clone --depth 1 --branch v$KANIKO_VERSION https://github.com/GoogleContainerTools/kaniko . \
   && go mod edit -replace code.gitea.io/sdk/gitea=code.gitea.io/sdk/gitea@v0.15.1 \
+  && go mod edit -go=1.17 \
   && go mod vendor \
   && make GOARCH=$(cat /goarch)
 

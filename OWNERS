@@ -1,8 +1,4 @@
+reviewers:
+  - ci-reviewers
 approvers:
- - clebs
- - suleymanakbas91
- - a-thaler
- - hisarbalik
- - bszwarc
- - lilitgh
- - rakesh-garimella
+  - ci-approvers

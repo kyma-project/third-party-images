@@ -1,0 +1,64 @@
+aliases:
+  ci-reviewers:
+    - Ressetkk
+    - ammarlakis
+    - dekiel
+    - Halamix2
+    - kasiakepka
+  ci-approvers:
+    - Ressetkk
+    - dekiel
+    - Halamix2
+  technical-writers:
+    - klaudiagrz
+    - mmitoraj
+    - majakurcius
+    - NHingerl
+    - grego952
+
+  serverless-reviewers: 
+    - m00g3n
+    - pPrecel
+    - dbadura
+    - moelsayed
+    - cortey
+  serverless-approvers: 
+    - m00g3n
+    - pPrecel
+    - dbadura
+    - moelsayed
+    - cortey
+
+  service-management-reviewers:
+    - wozniakjan
+    - voigt
+    - piotrmiskiewicz
+    - szwedm
+    - ralikio
+    - hanngos
+    - tillknuesting
+  service-management-approvers:
+    - wozniakjan
+    - voigt
+    - piotrmiskiewicz
+    - szwedm
+    - ralikio
+    - hanngos
+    - tillknuesting
+
+  observability-reviewers:
+    - a-thaler
+    - rakesh-garimella
+    - skhalash
+    - chrkl
+    - lindnerby
+    - shorim
+    - dennis-ge
+  observability-aprovers:
+    - a-thaler
+    - rakesh-garimella
+    - skhalash
+    - chrkl
+    - lindnerby
+    - shorim
+    - dennis-ge

@@ -44,7 +44,6 @@ aliases:
 
   service-management-reviewers:
     - wozniakjan
-    - voigt
     - piotrmiskiewicz
     - szwedm
     - ralikio
@@ -52,7 +51,6 @@ aliases:
     - tillknuesting
   service-management-approvers:
     - wozniakjan
-    - voigt
     - piotrmiskiewicz
     - szwedm
     - ralikio

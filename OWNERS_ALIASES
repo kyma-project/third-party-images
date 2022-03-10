@@ -9,6 +9,19 @@ aliases:
     - Ressetkk
     - dekiel
     - Halamix2
+
+  documentation-reviewers:
+    - klaudiagrz
+    - mmitoraj
+    - majakurcius
+    - NHingerl
+    - grego952
+  documentation-approvers:
+    - klaudiagrz
+    - mmitoraj
+    - majakurcius
+    - NHingerl
+    - grego952
   technical-writers:
     - klaudiagrz
     - mmitoraj

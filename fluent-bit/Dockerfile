@@ -75,7 +75,7 @@ RUN cp conf/fluent-bit.conf \
 FROM golang:1.18 as lokibuilder
 
 # 2.2.x is the last version on Apache 2.0 license, please verify the license before upgrading further
-ENV LOKI_VERSION 2.2.1 
+ENV LOKI_VERSION 2.2.1
 
 RUN mkdir -p /tmp/src /loki
 RUN curl -L https://github.com/grafana/loki/archive/v${LOKI_VERSION}.tar.gz | \

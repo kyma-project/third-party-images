@@ -12,15 +12,15 @@
 *.md @bszwarc @majakurcius @tomekpapiernik @kazydek @klaudiagrz @alexandra-simeonova @mmitoraj
 
 /.github/ISSUE_TEMPLATE @nhingerl @grego952 @klaudiagrz @majakurcius @mmitoraj
-/.github @ressetkk @ammarlakis @kasiakepka @dekiel @halamix2
+/.github @kyma-project/prow
 /cloudsql-proxy @ralikio @szwedm @tillknuesting @wozniakjan @hanngos @piotrmiskiewicz @pk85
-/common @ammarlakis @kasiakepka @dekiel @halamix2 @ressetkk
+/common @kyma-project/prow
 /docker-registry @cortey @dbadura @m00g3n @moelsayed @pprecel
 /etcd @pk85 @ralikio @szwedm @tillknuesting @wozniakjan @hanngos @piotrmiskiewicz
 /fluent-bit @dennis-ge @lindnerby @rakesh-garimella @skhalash @a-thaler @chrkl
 /grafana @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash
 /jaeger-operator @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash
-/k8s-tools @ressetkk @ammarlakis @kasiakepka @dekiel @halamix2
+/k8s-tools @kyma-project/prow
 /kaniko-executer @pprecel @cortey @dbadura @m00g3n @moelsayed
 /kiali @skhalash @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella
 /kiwigrid-sidecar @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash @a-thaler

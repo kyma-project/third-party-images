@@ -1,4 +1,4 @@
-FROM eu.gcr.io/kyma-project/external/golang:1.18.0-alpine3.15 as build
+FROM eu.gcr.io/kyma-project/external/golang:1.18.1-alpine3.15 as build
 
 ENV GO111MODULE=auto
 ENV DISTRIBUTION_DIR /go/src/github.com/docker/distribution

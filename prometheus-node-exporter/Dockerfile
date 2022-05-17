@@ -21,3 +21,4 @@ USER nobody
 LABEL source=git@github.com:kyma-project/kyma.git
 
 ENTRYPOINT ["node_exporter"]
+

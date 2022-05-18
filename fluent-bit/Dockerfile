@@ -2,7 +2,7 @@ ARG FLB_VERSION
 FROM fluent/fluent-bit:${FLB_VERSION} as fluentbit
 
 # build sequential_http plugin
-FROM debian:testing-20220509-slim as plugin-builder
+FROM debian:bullseye-slim as plugin-builder
 ARG FLB_VERSION
 ARG FLB_TARBALL=https://github.com/fluent/fluent-bit/archive/v$FLB_VERSION.tar.gz
 ENV FLB_SOURCE $FLB_TARBALL

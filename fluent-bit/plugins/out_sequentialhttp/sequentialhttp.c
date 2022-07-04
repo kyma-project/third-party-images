@@ -609,6 +609,16 @@ static struct flb_config_map config_map[] = {
      0, FLB_TRUE, offsetof(struct flb_out_sequentialhttp, gelf_fields.level_key),
      "Specify the key to use for the 'level' in gelf format"
     },
+    {
+     FLB_CONFIG_MAP_STR, "body_key", NULL,
+     0, FLB_TRUE, offsetof(struct flb_out_http, body_key),
+     "Specify the key which contains the body"
+    },
+    {
+     FLB_CONFIG_MAP_STR, "headers_key", NULL,
+     0, FLB_TRUE, offsetof(struct flb_out_http, headers_key),
+     "Specify the key which contains the headers"
+    },
 
     /* EOF */
     {0}

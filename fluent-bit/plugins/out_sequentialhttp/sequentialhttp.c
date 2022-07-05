@@ -610,22 +610,22 @@ static struct flb_config_map config_map[] = {
     },
     {
      FLB_CONFIG_MAP_STR, "body_key", NULL,
-     0, FLB_TRUE, offsetof(struct flb_out_http, body_key),
+     0, FLB_TRUE, offsetof(struct flb_out_sequentialhttp, body_key),
      "Specify the key which contains the body"
     },
     {
      FLB_CONFIG_MAP_STR, "headers_key", NULL,
-     0, FLB_TRUE, offsetof(struct flb_out_http, headers_key),
+     0, FLB_TRUE, offsetof(struct flb_out_sequentialhttp, headers_key),
      "Specify the key which contains the headers"
     },
     {
      FLB_CONFIG_MAP_STR, "body_key", NULL,
-     0, FLB_TRUE, offsetof(struct flb_out_http, body_key),
+     0, FLB_TRUE, offsetof(struct flb_out_sequentialhttp, body_key),
      "Specify the key which contains the body"
     },
     {
      FLB_CONFIG_MAP_STR, "headers_key", NULL,
-     0, FLB_TRUE, offsetof(struct flb_out_http, headers_key),
+     0, FLB_TRUE, offsetof(struct flb_out_sequentialhttp, headers_key),
      "Specify the key which contains the headers"
     },
 

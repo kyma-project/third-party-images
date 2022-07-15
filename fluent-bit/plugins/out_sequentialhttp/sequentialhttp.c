@@ -600,6 +600,12 @@ static int pack_msgpack_to_json_format_and_send_sequentially(struct flb_out_sequ
     int ret = FLB_OK;
     int ret_temp = FLB_ERROR;
 
+    records = flb_mp_count(data, bytes);
+    if (records <= 0)
+    {
+        return FLB_ERROR;
+    }
+
     /* For json lines and streams mode we need a pre-allocated buffer */
     // if (json_format == FLB_PACK_JSON_FORMAT_LINES ||
     //     json_format == FLB_PACK_JSON_FORMAT_STREAM) {
@@ -625,12 +631,6 @@ static int pack_msgpack_to_json_format_and_send_sequentially(struct flb_out_sequ
      * ]
      */
     if (json_format == FLB_PACK_JSON_FORMAT_JSON) {
-        records = flb_mp_count(data, bytes);
-        if (records <= 0) {
-            //flb_sds_destroy(out_buf);
-            msgpack_sbuffer_destroy(&tmp_sbuf);
-            return FLB_ERROR;
-        }
         msgpack_pack_array(&tmp_pck, records);
     }
 

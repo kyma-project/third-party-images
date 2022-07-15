@@ -627,7 +627,7 @@ static int pack_msgpack_to_json_format_and_send_sequentially(struct flb_out_sequ
     if (json_format == FLB_PACK_JSON_FORMAT_JSON) {
         records = flb_mp_count(data, bytes);
         if (records <= 0) {
-            flb_sds_destroy(out_buf);
+            //flb_sds_destroy(out_buf);
             msgpack_sbuffer_destroy(&tmp_sbuf);
             return FLB_ERROR;
         }
@@ -708,7 +708,7 @@ static int pack_msgpack_to_json_format_and_send_sequentially(struct flb_out_sequ
         /* Encode current record into JSON in a temporary variable */
         out_js = flb_msgpack_raw_to_json_sds(tmp_sbuf.data, tmp_sbuf.size);
         if (!out_js) {
-            flb_sds_destroy(out_buf);
+            //flb_sds_destroy(out_buf);
             msgpack_sbuffer_destroy(&tmp_sbuf);
             msgpack_unpacked_destroy(&result);
             return FLB_ERROR;

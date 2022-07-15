@@ -600,16 +600,10 @@ static int pack_msgpack_to_json_format_and_send_sequentially(struct flb_out_sequ
     int ret = FLB_OK;
     int ret_temp = FLB_ERROR;
 
-    records = flb_mp_count(data, bytes);
-    if (records <= 0)
-    {
-        return FLB_ERROR;
-    }
-
     /* For json lines and streams mode we need a pre-allocated buffer */
     // if (json_format == FLB_PACK_JSON_FORMAT_LINES ||
     //     json_format == FLB_PACK_JSON_FORMAT_STREAM) {
-    //     out_buf = flb_sds_create_size(bytes * 1.25);
+    //     out_buf = flb_sds_create_size(bytes + bytes / 4);
     //     if (!out_buf) {
     //         flb_errno();
     //         return NULL;
@@ -620,17 +614,34 @@ static int pack_msgpack_to_json_format_and_send_sequentially(struct flb_out_sequ
     msgpack_sbuffer_init(&tmp_sbuf);
     msgpack_packer_init(&tmp_pck, &tmp_sbuf, msgpack_sbuffer_write);
 
-    if (json_format == FLB_PACK_JSON_FORMAT_JSON)
-    {
+    /*
+     * If the format is the original msgpack style of one big array,
+     * registrate the array, otherwise is not necessary. FYI, original format:
+     *
+     * [
+     *   [timestamp, map],
+     *   [timestamp, map],
+     *   [T, M]...
+     * ]
+     */
+    if (json_format == FLB_PACK_JSON_FORMAT_JSON) {
+        records = flb_mp_count(data, bytes);
+        if (records <= 0) {
+            flb_sds_destroy(out_buf);
+            msgpack_sbuffer_destroy(&tmp_sbuf);
+            return FLB_ERROR;
+        }
         msgpack_pack_array(&tmp_pck, records);
     }
+
     msgpack_unpacked_init(&result);
-    while (msgpack_unpack_next(&result, data, bytes, &off) == ok)
-    {
+    while (msgpack_unpack_next(&result, data, bytes, &off) == ok) {
         /* Each array must have two entries: time and record */
         root = result.data;
-        if (root.via.array.size != 2)
-        {
+        if (root.type != MSGPACK_OBJECT_ARRAY) {
+            continue;
+        }
+        if (root.via.array.size != 2) {
             continue;
         }
 
@@ -639,26 +650,25 @@ static int pack_msgpack_to_json_format_and_send_sequentially(struct flb_out_sequ
 
         /* Get the record/map */
         map = root.via.array.ptr[1];
+        if (map.type != MSGPACK_OBJECT_MAP) {
+            continue;
+        }
         map_size = map.via.map.size;
 
-        if (date_key != NULL)
-        {
+        if (date_key != NULL) {
             msgpack_pack_map(&tmp_pck, map_size + 1);
         }
-        else
-        {
+        else {
             msgpack_pack_map(&tmp_pck, map_size);
         }
 
-        if (date_key != NULL)
-        {
+        if (date_key != NULL) {
             /* Append date key */
             msgpack_pack_str(&tmp_pck, flb_sds_len(date_key));
             msgpack_pack_str_body(&tmp_pck, date_key, flb_sds_len(date_key));
 
             /* Append date value */
-            switch (date_format)
-            {
+            switch (date_format) {
             case FLB_PACK_JSON_DATE_DOUBLE:
                 msgpack_pack_double(&tmp_pck, flb_time_to_double(&tms));
                 break;
@@ -671,7 +681,7 @@ static int pack_msgpack_to_json_format_and_send_sequentially(struct flb_out_sequ
                 len = snprintf(time_formatted + s,
                                sizeof(time_formatted) - 1 - s,
                                ".%06" PRIu64 "Z",
-                               (uint64_t)tms.tm.tv_nsec / 1000);
+                               (uint64_t) tms.tm.tv_nsec / 1000);
                 s += len;
                 msgpack_pack_str(&tmp_pck, s);
                 msgpack_pack_str_body(&tmp_pck, time_formatted, s);
@@ -681,9 +691,9 @@ static int pack_msgpack_to_json_format_and_send_sequentially(struct flb_out_sequ
                 break;
             }
         }
+
         /* Append remaining keys/values */
-        for (i = 0; i < map_size; i++)
-        {
+        for (i = 0; i < map_size; i++) {
             k = &map.via.map.ptr[i].key;
             v = &map.via.map.ptr[i].val;
             msgpack_pack_object(&tmp_pck, *k);
@@ -697,9 +707,10 @@ static int pack_msgpack_to_json_format_and_send_sequentially(struct flb_out_sequ
 
         /* Encode current record into JSON in a temporary variable */
         out_js = flb_msgpack_raw_to_json_sds(tmp_sbuf.data, tmp_sbuf.size);
-        if (!out_js)
-        {
+        if (!out_js) {
+            flb_sds_destroy(out_buf);
             msgpack_sbuffer_destroy(&tmp_sbuf);
+            msgpack_unpacked_destroy(&result);
             return FLB_ERROR;
         }
 

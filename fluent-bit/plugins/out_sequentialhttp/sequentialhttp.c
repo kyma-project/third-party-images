@@ -779,13 +779,6 @@ static void cb_http_flush(struct flb_event_chunk *event_chunk,
                                                                     ctx->json_date_format,
                                                                     ctx->date_key, event_chunk->tag,
                                                                     flb_sds_len(event_chunk->tag));
-            if (ret != FLB_OK) {
-                FLB_OUTPUT_RETURN(ret);
-            }
-            ret = http_post(ctx, out_body, out_size,
-                                event_chunk->tag, flb_sds_len(event_chunk->tag), NULL);
-            flb_sds_destroy(out_body);
-                
         }
         else if (ctx->out_format == FLB_HTTP_OUT_GELF) {
             ret = compose_payload(ctx, event_chunk->data, event_chunk->size,

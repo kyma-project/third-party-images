@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Builds the static Go image to execute in a Kubernetes job
+# Builds the static Go image (1.18.1-alpine3.15) to execute in a Kubernetes job from
 
-FROM eu.gcr.io/kyma-project/external/golang:1.18.1-alpine3.15 as builder
+FROM eu.gcr.io/kyma-project/external/golang@sha256:f94174c5262af3d8446833277aa27af400fd1a880277d43ec436df06ef3bb8ab as builder
 
 ARG KANIKO_VERSION
 ARG GOARCH=amd64
@@ -56,8 +56,8 @@ RUN git clone --depth 1 --branch v$KANIKO_VERSION https://github.com/GoogleConta
   && go mod vendor \
   && make GOARCH=$(cat /goarch)
 
-# Generate latest ca-certificates
-FROM debian:buster-slim AS certs
+# Generate ca-certificates
+FROM debian@sha256:5b0b1a9a54651bbe9d4d3ee96bbda2b2a1da3d2fa198ddebbced46dfdca7f216 AS certs
 
 RUN \
   apt update && \

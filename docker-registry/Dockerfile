@@ -1,4 +1,5 @@
-FROM eu.gcr.io/kyma-project/external/golang:1.18.1-alpine3.15 as build
+# Builds the static Go image (1.18.1-alpine3.15) to execute in a Kubernetes job
+FROM eu.gcr.io/kyma-project/external/golang@sha256:f94174c5262af3d8446833277aa27af400fd1a880277d43ec436df06ef3bb8ab as build
 
 ENV GO111MODULE=auto
 ENV DISTRIBUTION_DIR /go/src/github.com/docker/distribution
@@ -17,7 +18,8 @@ RUN git clone -b release/2.7 https://github.com/distribution/distribution $DISTR
 
 RUN CGO_ENABLED=0 make PREFIX=/go clean binaries && file ./bin/registry | grep "statically linked"
 
-FROM eu.gcr.io/kyma-project/external/alpine:3.15.4
+# Build result image base on alpine:3.15.4
+FROM eu.gcr.io/kyma-project/external/alpine@sha256:a777c9c66ba177ccfea23f2a216ff6721e78a662cd17019488c417135299cd89
 
 RUN set -ex \
     && apk upgrade --no-cache \

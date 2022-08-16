@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Builds the static Go image (1.18.1-alpine3.15) to execute in a Kubernetes job from
+# Builds the static Go image (1.18.1-alpine3.15) to execute in a Kubernetes job
 
 FROM eu.gcr.io/kyma-project/external/golang@sha256:f94174c5262af3d8446833277aa27af400fd1a880277d43ec436df06ef3bb8ab as builder
 

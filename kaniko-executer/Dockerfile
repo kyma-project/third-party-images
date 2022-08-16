@@ -56,7 +56,7 @@ RUN git clone --depth 1 --branch v$KANIKO_VERSION https://github.com/GoogleConta
   && go mod vendor \
   && make GOARCH=$(cat /goarch)
 
-# Generate ca-certificates
+# Generate ca-certificates from buster-slim
 FROM debian@sha256:5b0b1a9a54651bbe9d4d3ee96bbda2b2a1da3d2fa198ddebbced46dfdca7f216 AS certs
 
 RUN \

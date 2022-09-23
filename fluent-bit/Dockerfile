@@ -71,7 +71,7 @@ RUN curl -L https://github.com/grafana/loki/archive/v${LOKI_VERSION}.tar.gz | \
     tar zx --strip=1 -C /tmp/src/
 WORKDIR /tmp/src
 
-# fix compatibility issue with golang 1.18
+# fix compatibility issue with golang 1.19
 RUN go get github.com/json-iterator/go@v1.1.12
 RUN go mod vendor
 

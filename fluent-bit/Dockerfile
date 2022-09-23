@@ -62,7 +62,7 @@ RUN cmake -DFLB_SOURCE=/tmp/fluent-bit \
 RUN make -j $(getconf _NPROCESSORS_ONLN)
 
 # build loki plugin
-FROM golang:1.17 as loki-builder
+FROM golang:1.19 as loki-builder
 ARG LOKI_VERSION
 
 RUN mkdir -p /tmp/src /loki

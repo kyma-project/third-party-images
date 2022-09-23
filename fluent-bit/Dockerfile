@@ -70,6 +70,7 @@ RUN curl -L https://github.com/grafana/loki/archive/v${LOKI_VERSION}.tar.gz | \
     tar zx --strip=1 -C /tmp/src/
 WORKDIR /tmp/src
 RUN go get github.com/json-iterator/go@v1.1.12
+RUN go mod vendor
 RUN make clean && make BUILD_IN_CONTAINER=false fluent-bit-plugin 
 RUN cp /tmp/src/cmd/fluent-bit/out_grafana_loki.so /loki
 

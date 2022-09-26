@@ -6,9 +6,6 @@ WORKDIR /src/loki
 ADD https://github.com/grafana/loki/archive/refs/tags/v${LOKI_VERSION}.tar.gz /loki.tar.gz
 RUN tar -xz --strip-components=1 --directory=/src/loki --file=/loki.tar.gz
 
-# remove netgo check
-#COPY MAKE2 Makefile
-
 # fix compatibility issue with golang 1.19
 RUN go get github.com/json-iterator/go@v1.1.12
 RUN go mod vendor

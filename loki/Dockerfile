@@ -1,14 +1,26 @@
+FROM golang:1.19 as build
+
 ARG LOKI_VERSION
 
-FROM grafana/loki:${LOKI_VERSION} as builder
+WORKDIR /src/loki
+ADD https://github.com/grafana/loki/archive/refs/tags/v${LOKI_VERSION}.tar.gz /loki.tar.gz
+RUN tar -xz --strip-components=1 --directory=/src/loki --file=/loki.tar.gz
 
-FROM alpine:3.16.2
+# remove netgo check
+#COPY MAKE2 Makefile
 
-RUN apk --no-cache upgrade && \
-    apk add --no-cache ca-certificates libcap
+# fix compatibility issue with golang 1.19
+RUN go get github.com/json-iterator/go@v1.1.12
+RUN go mod vendor
 
-COPY --from=builder /usr/bin/loki /usr/bin/loki
-COPY --from=builder /etc/loki/local-config.yaml /etc/loki/local-config.yaml
+RUN make NETGO_CHECK='' clean && make BUILD_IN_CONTAINER=false NETGO_CHECK='' loki
+
+FROM alpine:3.16
+
+RUN apk add --no-cache ca-certificates libcap
+
+COPY --from=build /src/loki/cmd/loki/loki /usr/bin/loki
+COPY --from=build /src/loki/cmd/loki/loki-docker-config.yaml /etc/loki/local-config.yaml
 
 RUN addgroup -g 10001 -S loki && \
     adduser -u 10001 -S loki -G loki
@@ -23,4 +35,3 @@ USER loki
 EXPOSE 3100
 ENTRYPOINT [ "/usr/bin/loki" ]
 CMD ["-config.file=/etc/loki/local-config.yaml"]
-

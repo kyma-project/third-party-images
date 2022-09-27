@@ -1,13 +1,60 @@
-ARG GRAFANA_VERSION
+# Fetch the sources
+FROM alpine:3.16.2 as fetcher
 
-FROM grafana/grafana:${GRAFANA_VERSION} as grafana-builder
+WORKDIR /build
+ADD https://github.com/grafana/grafana/archive/refs/tags/v7.5.16.tar.gz /grafana.tar.bz2
+RUN tar -xf /grafana.tar.bz2 -C /build --strip-components 1
 
-FROM alpine:3.16.2 as grafana
+# Build UI components
+FROM node:14.15.5-alpine3.13 as js-builder
+# WORKDIR /grafana
+# COPY --from=fetcher /build /grafana/
+WORKDIR /usr/src/app/
+COPY --from=fetcher /build/package.json /build/yarn.lock ./
+COPY --from=fetcher /build/packages packages
+
+RUN apk add --no-cache git
+
+RUN yarn install --pure-lockfile --no-progress
+
+COPY --from=fetcher /build/tsconfig.json /build/.eslintrc /build/.editorconfig /build/.browserslistrc /build/.prettierrc.js ./
+COPY --from=fetcher  /build/public public
+COPY --from=fetcher  /build/tools tools
+COPY --from=fetcher  /build/scripts scripts
+COPY --from=fetcher  /build/emails emails
+
+ENV NODE_ENV production
+RUN yarn build
+
+# Build go components
+FROM golang:1.19.0-alpine3.16 as go-builder
+
+RUN apk add --no-cache gcc g++
+
+WORKDIR $GOPATH/src/github.com/grafana/grafana
+
+COPY --from=fetcher /build/go.mod ./
+COPY --from=fetcher /build/go.sum ./
+
+COPY --from=fetcher /build/pkg pkg
+
+RUN go mod verify
+
+# COPY --from=fetcher /build/pkg pkg
+COPY --from=fetcher /build/build.go /build/package.json ./
+
+RUN go run build.go build
+
+
+# Final stage
+FROM alpine:3.13
+
+LABEL maintainer="Grafana team <hello@grafana.com>"
 
 ARG GF_UID="472"
 ARG GF_GID="0"
 
-ENV PATH=/usr/share/grafana/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+ENV PATH="/usr/share/grafana/bin:$PATH" \
     GF_PATHS_CONFIG="/etc/grafana/grafana.ini" \
     GF_PATHS_DATA="/var/lib/grafana" \
     GF_PATHS_HOME="/usr/share/grafana" \
@@ -17,11 +64,10 @@ ENV PATH=/usr/share/grafana/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bi
 
 WORKDIR $GF_PATHS_HOME
 
-RUN apk --no-cache upgrade && \
-    apk add --no-cache ca-certificates bash tzdata && \
+RUN apk add --no-cache ca-certificates bash tzdata && \
     apk add --no-cache openssl musl-utils
 
-COPY --from=grafana-builder "$GF_PATHS_HOME" "$GF_PATHS_HOME"
+COPY --from=fetcher /build/conf ./conf
 
 RUN if [ ! $(getent group "$GF_GID") ]; then \
       addgroup -S -g $GF_GID grafana; \
@@ -42,14 +88,18 @@ RUN export GF_GID_NAME=$(getent group $GF_GID | cut -d':' -f1) && \
     chown -R "grafana:$GF_GID_NAME" "$GF_PATHS_DATA" "$GF_PATHS_HOME/.aws" "$GF_PATHS_LOGS" "$GF_PATHS_PLUGINS" "$GF_PATHS_PROVISIONING" && \
     chmod -R 777 "$GF_PATHS_DATA" "$GF_PATHS_HOME/.aws" "$GF_PATHS_LOGS" "$GF_PATHS_PLUGINS" "$GF_PATHS_PROVISIONING"
 
+COPY --from=go-builder /go/src/github.com/grafana/grafana/bin/linux-amd64/grafana-server /go/src/github.com/grafana/grafana/bin/linux-amd64/grafana-cli ./bin/
+COPY --from=js-builder /usr/src/app/public ./public
+COPY --from=js-builder /usr/src/app/tools ./tools
+
 EXPOSE 3000
 
-COPY ./run.sh /run.sh
+COPY --from=fetcher /build/packaging/docker/run.sh /run.sh
 
-USER "$GF_UID"
+USER grafana
 ENTRYPOINT [ "/run.sh" ]
 
-FROM golang:1.18 as go-builder
+FROM golang:1.18 as gw-builder
 
 ENV GO111MODULE=on
 
@@ -73,7 +123,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o grafanawatcher main.go
 FROM grafana
 
 WORKDIR /
-COPY --from=go-builder /workspace/grafanawatcher .
+COPY --from=gw-builder /workspace/grafanawatcher .
 USER 65532:65532
 
 ENTRYPOINT ["/grafanawatcher"]

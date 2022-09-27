@@ -104,6 +104,8 @@ ENTRYPOINT [ "/run.sh" ]
 
 FROM golang:${GOLANG_VERSION}  as gw-builder
 
+RUN apk add --no-cache gcc g++
+
 ENV GO111MODULE=on
 
 WORKDIR /workspace

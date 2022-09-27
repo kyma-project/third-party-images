@@ -1,0 +1,1618 @@
+From 814fdd25d10931715b92d2f32a107d186688ce34 Mon Sep 17 00:00:00 2001
+From: kay delaney <45561153+kaydelaney@users.noreply.github.com>
+Date: Mon, 26 Sep 2022 10:35:29 +0100
+Subject: [PATCH] [v7.5.x] Chore: Update slate and related packages (#54566)
+ (#55688)
+
+---
+ .gitignore                                    |   1 +
+ package.json                                  |  18 +-
+ packages/grafana-runtime/tsconfig.json        |   3 -
+ .../src/config/webpack.plugin.config.ts       |   2 +-
+ packages/grafana-ui/package.json              |  10 +-
+ .../components/DataLinks/DataLinkInput.tsx    |   6 +-
+ .../components/QueryField/QueryField.test.tsx |  14 +-
+ .../src/components/QueryField/QueryField.tsx  |  15 +-
+ .../src/slate-plugins/braces.test.tsx         |  20 +-
+ .../grafana-ui/src/slate-plugins/braces.ts    |  27 ++-
+ .../src/slate-plugins/clear.test.tsx          |  10 +-
+ .../grafana-ui/src/slate-plugins/clear.ts     |  10 +-
+ .../grafana-ui/src/slate-plugins/clipboard.ts |  37 +--
+ .../src/slate-plugins/indentation.ts          |  26 +--
+ .../grafana-ui/src/slate-plugins/newline.ts   |  10 +-
+ .../src/slate-plugins/runner.test.tsx         |  12 +-
+ .../grafana-ui/src/slate-plugins/runner.ts    |  16 +-
+ .../src/slate-plugins/selection_shortcuts.ts  |  11 +-
+ .../src/slate-plugins/slate-prism/index.ts    |   5 +-
+ .../src/slate-plugins/slate-prism/options.tsx |   2 +-
+ .../src/slate-plugins/suggestions.tsx         |  51 +++--
+ packages/grafana-ui/src/types/completion.ts   |   5 +-
+ packages/grafana-ui/tsconfig.json             |   1 -
+ packages/jaeger-ui-components/package.json    |   2 +-
+ packages/jaeger-ui-components/tsconfig.json   |   3 -
+ patches/slate-dev-environment+0.2.5.patch     |  44 ++++
+ .../explore/slate-plugins/prism/index.tsx     |   2 +-
+ public/app/features/plugins/plugin_loader.ts  |   8 +-
+ .../cloudwatch/components/LogsQueryField.tsx  |   5 +-
+ .../editor/KustoQueryField.tsx                |   4 +-
+ .../editor/query_field.tsx                    |  13 +-
+ .../loki/components/LokiQueryFieldForm.tsx    |   3 +-
+ .../prometheus/components/PromQueryField.tsx  |   7 +-
+ tsconfig.json                                 |   1 -
+ yarn.lock                                     | 216 ++++++++++--------
+ 35 files changed, 355 insertions(+), 265 deletions(-)
+ create mode 100644 patches/slate-dev-environment+0.2.5.patch
+
+diff --git a/.gitignore b/.gitignore
+index 4ff100296a..222e3d8c26 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -98,6 +98,7 @@ debug.test
+ 
+ /scripts/build/release_publisher/release_publisher
+ *.patch
++!patches/slate-dev-environment*.patch
+ 
+ # Ignoring frontend packages specifics
+ /packages/**/dist
+diff --git a/package.json b/package.json
+index e6a40f91a3..1d97cf1347 100644
+--- a/package.json
++++ b/package.json
+@@ -29,6 +29,7 @@
+     "packages:publishDev": "lerna publish from-package --contents dist --dist-tag dev --yes --registry http://grafana-npm.local:4873 --force-publish=*",
+     "packages:typecheck": "lerna run typecheck",
+     "packages:clean": "lerna run clean",
++    "postinstall": "patch-package",
+     "precommit": "yarn run lint-staged",
+     "prettier:check": "prettier --list-different \"**/*.{ts,tsx,scss}\"",
+     "prettier:write": "prettier --list-different \"**/*.{ts,tsx,scss,js}\" --write",
+@@ -114,9 +115,9 @@
+     "@types/redux-logger": "3.0.7",
+     "@types/redux-mock-store": "1.0.2",
+     "@types/reselect": "2.2.0",
+-    "@types/slate": "0.47.1",
+-    "@types/slate-plain-serializer": "0.6.1",
+-    "@types/slate-react": "0.22.5",
++    "@types/slate": "0.47.9",
++    "@types/slate-plain-serializer": "0.7.2",
++    "@types/slate-react": "0.22.9",
+     "@types/testing-library__jest-dom": "5.9.5",
+     "@types/testing-library__react-hooks": "^3.2.0",
+     "@types/tinycolor2": "1.4.2",
+@@ -169,6 +170,8 @@
+     "mutationobserver-shim": "0.3.3",
+     "ngtemplate-loader": "2.0.1",
+     "optimize-css-assets-webpack-plugin": "5.0.4",
++    "patch-package": "^6.4.7",
++    "postinstall-postinstall": "^2.1.0",
+     "postcss-browser-reporter": "0.6.0",
+     "postcss-loader": "3.0.0",
+     "postcss-reporter": "6.0.1",
+@@ -201,7 +204,6 @@
+   "dependencies": {
+     "@emotion/core": "10.0.27",
+     "@grafana/aws-sdk": "0.0.3",
+-    "@grafana/slate-react": "0.22.9-grafana",
+     "@popperjs/core": "2.5.4",
+     "@reduxjs/toolkit": "1.5.0",
+     "@sentry/browser": "5.25.0",
+@@ -283,8 +285,10 @@
+     "rst2html": "github:thoward/rst2html#990cb89",
+     "rxjs": "6.6.3",
+     "search-query-parser": "1.5.4",
+-    "slate": "0.47.8",
+-    "slate-plain-serializer": "0.7.10",
++    "slate": "0.47.9",
++    "slate-dev-environment": "0.2.5",
++    "slate-plain-serializer": "0.7.11",
++    "slate-react": "0.22.10",
+     "tether": "1.4.7",
+     "tether-drop": "https://github.com/torkelo/drop/tarball/master",
+     "tinycolor2": "1.4.1",
+@@ -294,6 +298,8 @@
+     "whatwg-fetch": "3.1.0"
+   },
+   "resolutions": {
++    "@types/slate": "0.47.9",
++    "slate-dev-environment": "0.2.5",
+     "caniuse-db": "1.0.30000772",
+     "react-use-measure": "https://github.com/mckn/react-use-measure.git#remove-cjs-export"
+   },
+diff --git a/packages/grafana-runtime/tsconfig.json b/packages/grafana-runtime/tsconfig.json
+index f8ab70ac70..7779ae791e 100644
+--- a/packages/grafana-runtime/tsconfig.json
++++ b/packages/grafana-runtime/tsconfig.json
+@@ -4,9 +4,6 @@
+     "declarationDir": "dist",
+     "outDir": "compiled",
+     "rootDirs": ["."],
+-    "paths": {
+-      "@grafana/slate-react": ["../grafana-ui/node_modules/@types/slate-react"]
+-    },
+     "typeRoots": ["node_modules/@types"]
+   },
+   "exclude": ["dist", "node_modules"],
+diff --git a/packages/grafana-toolkit/src/config/webpack.plugin.config.ts b/packages/grafana-toolkit/src/config/webpack.plugin.config.ts
+index 106eb6225a..294689c9ce 100644
+--- a/packages/grafana-toolkit/src/config/webpack.plugin.config.ts
++++ b/packages/grafana-toolkit/src/config/webpack.plugin.config.ts
+@@ -177,7 +177,7 @@ const getBaseWebpackConfig: WebpackConfigurationGetter = async (options) => {
+       'emotion',
+       'prismjs',
+       'slate-plain-serializer',
+-      '@grafana/slate-react',
++      'slate-react',
+       'react',
+       'react-dom',
+       'react-redux',
+diff --git a/packages/grafana-ui/package.json b/packages/grafana-ui/package.json
+index ade56a14e1..ae2504b178 100644
+--- a/packages/grafana-ui/package.json
++++ b/packages/grafana-ui/package.json
+@@ -30,7 +30,6 @@
+     "@grafana/aws-sdk": "0.0.3",
+     "@grafana/data": "7.5.16",
+     "@grafana/e2e-selectors": "7.5.16",
+-    "@grafana/slate-react": "0.22.9-grafana",
+     "@grafana/tsconfig": "^1.0.0-rc1",
+     "@iconscout/react-unicons": "1.1.4",
+     "@popperjs/core": "2.5.4",
+@@ -42,8 +41,9 @@
+     "@types/react-color": "3.0.1",
+     "@types/react-select": "3.0.8",
+     "@types/react-table": "7.0.12",
+-    "@types/slate": "0.47.1",
+-    "@types/slate-react": "0.22.5",
++    "@types/slate": "0.47.9",
++    "@types/slate-plain-serializer": "0.7.2",
++    "@types/slate-react": "0.22.9",
+     "@visx/event": "1.3.0",
+     "@visx/gradient": "1.0.0",
+     "@visx/scale": "1.4.0",
+@@ -76,7 +76,9 @@
+     "react-storybook-addon-props-combinations": "1.1.0",
+     "react-table": "7.0.0",
+     "react-transition-group": "4.4.1",
+-    "slate": "0.47.8",
++    "slate": "0.47.9",
++    "slate-plain-serializer": "0.7.11",
++    "slate-react": "0.22.10",
+     "tinycolor2": "1.4.1",
+     "uplot": "1.6.9"
+   },
+diff --git a/packages/grafana-ui/src/components/DataLinks/DataLinkInput.tsx b/packages/grafana-ui/src/components/DataLinks/DataLinkInput.tsx
+index 455a0aeadc..44b25ad9e7 100644
+--- a/packages/grafana-ui/src/components/DataLinks/DataLinkInput.tsx
++++ b/packages/grafana-ui/src/components/DataLinks/DataLinkInput.tsx
+@@ -7,7 +7,7 @@ import { getFormStyles, Portal } from '../index';
+ 
+ // @ts-ignore
+ import Prism, { Grammar, LanguageMap } from 'prismjs';
+-import { Editor } from '@grafana/slate-react';
++import { Editor } from 'slate-react';
+ import { Value } from 'slate';
+ import Plain from 'slate-plain-serializer';
+ import { Popper as ReactPopper } from 'react-popper';
+@@ -84,7 +84,7 @@ export const DataLinkInput: React.FC<DataLinkInputProps> = memo(
+     // SelectionReference is used to position the variables suggestion relatively to current DOM selection
+     const selectionRef = useMemo(() => new SelectionReference(), []);
+ 
+-    const onKeyDown = React.useCallback((event: KeyboardEvent, next: () => any) => {
++    const onKeyDown = React.useCallback((event: React.KeyboardEvent, next: () => any) => {
+       if (!stateRef.current.showingSuggestions) {
+         if (event.key === '=' || event.key === '$' || (event.keyCode === 32 && event.ctrlKey)) {
+           return setShowingSuggestions(true);
+@@ -190,7 +190,7 @@ export const DataLinkInput: React.FC<DataLinkInputProps> = memo(
+               placeholder={placeholder}
+               value={stateRef.current.linkUrl}
+               onChange={onUrlChange}
+-              onKeyDown={(event, _editor, next) => onKeyDown(event as KeyboardEvent, next)}
++              onKeyDown={(event, _editor, next) => onKeyDown(event, next)}
+               plugins={plugins}
+               className={cx(
+                 styles.editor,
+diff --git a/packages/grafana-ui/src/components/QueryField/QueryField.test.tsx b/packages/grafana-ui/src/components/QueryField/QueryField.test.tsx
+index 2136dbe041..763b275a53 100644
+--- a/packages/grafana-ui/src/components/QueryField/QueryField.test.tsx
++++ b/packages/grafana-ui/src/components/QueryField/QueryField.test.tsx
+@@ -1,7 +1,7 @@
+ import React from 'react';
+-import { shallow } from 'enzyme';
+ import { QueryField } from './QueryField';
+-import { Editor } from 'slate';
++import { shallow, mount } from 'enzyme';
++import { Editor } from 'slate-react';
+ 
+ describe('<QueryField />', () => {
+   it('should render with null initial value', () => {
+@@ -21,19 +21,20 @@ describe('<QueryField />', () => {
+ 
+   it('should execute query on blur', () => {
+     const onRun = jest.fn();
+-    const wrapper = shallow(
++    const wrapper = mount(
+       <QueryField query="my query" onTypeahead={jest.fn()} onRunQuery={onRun} portalOrigin="mock-origin" />
+     );
+     const field = wrapper.instance() as QueryField;
++    const ed = wrapper.find(Editor).instance() as Editor;
+     expect(onRun.mock.calls.length).toBe(0);
+-    field.handleBlur(new Event('bogus'), new Editor({}), () => {});
++    field.handleBlur(undefined, ed, () => {});
+     expect(onRun.mock.calls.length).toBe(1);
+   });
+ 
+   it('should run custom on blur, but not necessarily execute query', () => {
+     const onBlur = jest.fn();
+     const onRun = jest.fn();
+-    const wrapper = shallow(
++    const wrapper = mount(
+       <QueryField
+         query="my query"
+         onTypeahead={jest.fn()}
+@@ -43,9 +44,10 @@ describe('<QueryField />', () => {
+       />
+     );
+     const field = wrapper.instance() as QueryField;
++    const ed = wrapper.find(Editor).instance() as Editor;
+     expect(onBlur.mock.calls.length).toBe(0);
+     expect(onRun.mock.calls.length).toBe(0);
+-    field.handleBlur(new Event('bogus'), new Editor({}), () => {});
++    field.handleBlur(undefined, ed, () => {});
+     expect(onBlur.mock.calls.length).toBe(1);
+     expect(onRun.mock.calls.length).toBe(0);
+   });
+diff --git a/packages/grafana-ui/src/components/QueryField/QueryField.tsx b/packages/grafana-ui/src/components/QueryField/QueryField.tsx
+index b4c5810b33..42669c004c 100644
+--- a/packages/grafana-ui/src/components/QueryField/QueryField.tsx
++++ b/packages/grafana-ui/src/components/QueryField/QueryField.tsx
+@@ -1,10 +1,12 @@
+ import _ from 'lodash';
+ import React, { Context } from 'react';
+ 
+-import { Value, Editor as CoreEditor } from 'slate';
+-import { Editor, Plugin } from '@grafana/slate-react';
++import { Value } from 'slate';
+ import Plain from 'slate-plain-serializer';
+ import classnames from 'classnames';
++import { Editor, Plugin } from 'slate-react';
++
++import { selectors } from '@grafana/e2e-selectors';
+ 
+ import {
+   ClearPlugin,
+@@ -17,7 +19,6 @@ import {
+ } from '../../slate-plugins';
+ 
+ import { makeValue, SCHEMA, CompletionItemGroup, TypeaheadOutput, TypeaheadInput, SuggestionsState } from '../..';
+-import { selectors } from '@grafana/e2e-selectors';
+ 
+ export interface QueryFieldProps {
+   additionalPlugins?: Plugin[];
+@@ -31,7 +32,7 @@ export interface QueryFieldProps {
+   onBlur?: () => void;
+   onChange?: (value: string) => void;
+   onRichValueChange?: (value: Value) => void;
+-  onClick?: (event: Event, editor: CoreEditor, next: () => any) => any;
++  onClick?: (event: Event | React.MouseEvent, editor: Editor, next: () => any) => any;
+   onTypeahead?: (typeahead: TypeaheadInput) => Promise<TypeaheadOutput>;
+   onWillApplySuggestion?: (suggestion: string, state: SuggestionsState) => string;
+   placeholder?: string;
+@@ -55,7 +56,7 @@ export interface QueryFieldState {
+  * Implement props.onTypeahead to use suggestions, see PromQueryField.tsx as an example.
+  */
+ export class QueryField extends React.PureComponent<QueryFieldProps, QueryFieldState> {
+-  plugins: Plugin[];
++  plugins: Array<Plugin<Editor>>;
+   runOnChangeDebounced: Function;
+   lastExecutedValue: Value | null = null;
+   mounted = false;
+@@ -173,7 +174,7 @@ export class QueryField extends React.PureComponent<QueryFieldProps, QueryFieldS
+   /**
+    * We need to handle blur events here mainly because of dashboard panels which expect to have query executed on blur.
+    */
+-  handleBlur = (event: Event, editor: CoreEditor, next: Function) => {
++  handleBlur = (_: React.FocusEvent | undefined, editor: Editor, next: Function) => {
+     const { onBlur } = this.props;
+ 
+     if (onBlur) {
+@@ -220,5 +221,3 @@ export class QueryField extends React.PureComponent<QueryFieldProps, QueryFieldS
+     );
+   }
+ }
+-
+-export default QueryField;
+diff --git a/packages/grafana-ui/src/slate-plugins/braces.test.tsx b/packages/grafana-ui/src/slate-plugins/braces.test.tsx
+index ecd55b7f50..ac7ea93f0b 100644
+--- a/packages/grafana-ui/src/slate-plugins/braces.test.tsx
++++ b/packages/grafana-ui/src/slate-plugins/braces.test.tsx
+@@ -1,7 +1,8 @@
+ import React from 'react';
+ import Plain from 'slate-plain-serializer';
+-import { Editor } from '@grafana/slate-react';
+ import { shallow } from 'enzyme';
++import { Editor } from 'slate-react';
++
+ import { BracesPlugin } from './braces';
+ 
+ declare global {
+@@ -18,7 +19,7 @@ describe('braces', () => {
+     const value = Plain.deserialize('');
+     const editor = shallow<Editor>(<Editor value={value} />);
+     const event = new window.KeyboardEvent('keydown', { key: '(' });
+-    expect(handler(event as Event, editor.instance() as any, nextMock)).toBeTruthy();
++    expect(handler(event as any, editor.instance(), nextMock)).toBeTruthy();
+     expect(Plain.serialize(editor.instance().value)).toEqual('()');
+   });
+ 
+@@ -26,7 +27,8 @@ describe('braces', () => {
+     const value = Plain.deserialize('time()');
+     const editor = shallow<Editor>(<Editor value={value} />);
+     const event = new window.KeyboardEvent('keydown', { key: 'Backspace' });
+-    handler(event as Event, editor.instance().moveForward(5) as any, nextMock);
++    editor.instance().moveForward(5);
++    handler(event as any, editor.instance(), nextMock);
+     expect(Plain.serialize(editor.instance().value)).toEqual('time');
+   });
+ 
+@@ -34,7 +36,8 @@ describe('braces', () => {
+     const value = Plain.deserialize('time(value)');
+     const editor = shallow<Editor>(<Editor value={value} />);
+     const event = new window.KeyboardEvent('keydown', { key: 'Backspace' });
+-    const handled = handler(event as Event, editor.instance().moveForward(5) as any, nextMock);
++    editor.instance().moveForward(5);
++    const handled = handler(event as any, editor.instance(), nextMock);
+     expect(handled).toBeFalsy();
+   });
+ 
+@@ -42,9 +45,9 @@ describe('braces', () => {
+     const value = Plain.deserialize('');
+     const editor = shallow<Editor>(<Editor value={value} />);
+     const opening = new window.KeyboardEvent('keydown', { key: '(' });
+-    expect(handler(opening as Event, editor.instance() as any, nextMock)).toBeTruthy();
++    expect(handler(opening as any, editor.instance(), nextMock)).toBeTruthy();
+     const closing = new window.KeyboardEvent('keydown', { key: ')' });
+-    expect(handler(closing as Event, editor.instance() as any, nextMock)).toBeTruthy();
++    expect(handler(closing as any, editor.instance(), nextMock)).toBeTruthy();
+     expect(Plain.serialize(editor.instance().value)).toEqual('()');
+   });
+ 
+@@ -52,9 +55,10 @@ describe('braces', () => {
+     const value = Plain.deserialize('');
+     const editor = shallow<Editor>(<Editor value={value} />);
+     const event1 = new window.KeyboardEvent('keydown', { key: ')' });
+-    expect(handler(event1 as Event, editor.instance() as any, nextMock)).toBeFalsy();
++    expect(handler(event1 as any, editor.instance(), nextMock)).toBeFalsy();
+     const event2 = new window.KeyboardEvent('keydown', { key: ')' });
+-    expect(handler(event2 as Event, editor.instance().moveBackward(1) as any, nextMock)).toBeFalsy();
++    editor.instance().moveBackward(1);
++    expect(handler(event2 as any, editor.instance(), nextMock)).toBeFalsy();
+     expect(Plain.serialize(editor.instance().value)).toEqual('))');
+   });
+ });
+diff --git a/packages/grafana-ui/src/slate-plugins/braces.ts b/packages/grafana-ui/src/slate-plugins/braces.ts
+index dae974be82..7af64918c1 100644
+--- a/packages/grafana-ui/src/slate-plugins/braces.ts
++++ b/packages/grafana-ui/src/slate-plugins/braces.ts
+@@ -1,5 +1,5 @@
+-import { Plugin } from '@grafana/slate-react';
+-import { Editor as CoreEditor, Annotation } from 'slate';
++import { Annotation } from 'slate';
++import { Plugin } from 'slate-react';
+ import { v4 as uuidv4 } from 'uuid';
+ 
+ const BRACES: any = {
+@@ -12,11 +12,10 @@ const MATCH_MARK = 'brace_match';
+ 
+ export function BracesPlugin(): Plugin {
+   return {
+-    onKeyDown(event: Event, editor: CoreEditor, next: Function) {
+-      const keyEvent = event as KeyboardEvent;
++    onKeyDown(event, editor, next) {
+       const { value } = editor;
+ 
+-      switch (keyEvent.key) {
++      switch (event.key) {
+         case '(':
+         case '{':
+         case '[': {
+@@ -29,10 +28,10 @@ export function BracesPlugin(): Plugin {
+ 
+           // If text is selected, wrap selected text in parens
+           if (value.selection.isExpanded) {
+-            keyEvent.preventDefault();
++            event.preventDefault();
+             editor
+-              .insertTextByKey(startKey, startOffset, keyEvent.key)
+-              .insertTextByKey(endKey, endOffset + 1, BRACES[keyEvent.key])
++              .insertTextByKey(startKey, startOffset, event.key)
++              .insertTextByKey(endKey, endOffset + 1, BRACES[event.key])
+               .moveEndBackward(1);
+             return true;
+           } else if (
+@@ -41,8 +40,8 @@ export function BracesPlugin(): Plugin {
+             text[focusOffset] === ' ' ||
+             Object.values(BRACES).includes(text[focusOffset])
+           ) {
+-            keyEvent.preventDefault();
+-            const complement = BRACES[keyEvent.key];
++            event.preventDefault();
++            const complement = BRACES[event.key];
+             const matchAnnotation = {
+               key: `${MATCH_MARK}-${uuidv4()}`,
+               type: `${MATCH_MARK}-${complement}`,
+@@ -58,7 +57,7 @@ export function BracesPlugin(): Plugin {
+               },
+               object: 'annotation',
+             } as Annotation;
+-            editor.insertText(keyEvent.key).insertText(complement).addAnnotation(matchAnnotation).moveBackward(1);
++            editor.insertText(event.key).insertText(complement).addAnnotation(matchAnnotation).moveBackward(1);
+ 
+             return true;
+           }
+@@ -72,13 +71,13 @@ export function BracesPlugin(): Plugin {
+           const offset = value.selection.anchor.offset;
+           const nextChar = text[offset];
+           // Handle closing brace when it's already the next character
+-          const complement = keyEvent.key;
++          const complement = event.key;
+           const annotationType = `${MATCH_MARK}-${complement}`;
+           const annotation = value.annotations.find(
+             (a) => a?.type === annotationType && a.anchor.key === value.anchorText.key
+           );
+           if (annotation && nextChar === complement && !value.selection.isExpanded) {
+-            keyEvent.preventDefault();
++            event.preventDefault();
+             editor.moveFocusForward(1).removeAnnotation(annotation).moveAnchorForward(1);
+             return true;
+           }
+@@ -91,7 +90,7 @@ export function BracesPlugin(): Plugin {
+           const previousChar = text[offset - 1];
+           const nextChar = text[offset];
+           if (BRACES[previousChar] && BRACES[previousChar] === nextChar) {
+-            keyEvent.preventDefault();
++            event.preventDefault();
+             // Remove closing brace if directly following
+             editor.deleteBackward(1).deleteForward(1).focus();
+             return true;
+diff --git a/packages/grafana-ui/src/slate-plugins/clear.test.tsx b/packages/grafana-ui/src/slate-plugins/clear.test.tsx
+index d164301080..1ec1e55f56 100644
+--- a/packages/grafana-ui/src/slate-plugins/clear.test.tsx
++++ b/packages/grafana-ui/src/slate-plugins/clear.test.tsx
+@@ -1,7 +1,8 @@
+ import Plain from 'slate-plain-serializer';
+ import React from 'react';
+-import { Editor } from '@grafana/slate-react';
+ import { shallow } from 'enzyme';
++import { Editor } from 'slate-react';
++
+ import { ClearPlugin } from './clear';
+ 
+ describe('clear', () => {
+@@ -14,7 +15,7 @@ describe('clear', () => {
+       key: 'k',
+       ctrlKey: true,
+     });
+-    handler(event as Event, editor.instance() as any, () => {});
++    handler(event as any, editor.instance(), () => {});
+     expect(Plain.serialize(editor.instance().value)).toEqual('');
+   });
+ 
+@@ -25,7 +26,7 @@ describe('clear', () => {
+       key: 'k',
+       ctrlKey: true,
+     });
+-    handler(event as Event, editor.instance() as any, () => {});
++    handler(event as any, editor.instance(), () => {});
+     expect(Plain.serialize(editor.instance().value)).toEqual('');
+   });
+ 
+@@ -36,7 +37,8 @@ describe('clear', () => {
+       key: 'k',
+       ctrlKey: true,
+     });
+-    handler(event as Event, editor.instance().moveForward(4) as any, () => {});
++    editor.instance().moveForward(4);
++    handler(event as any, editor.instance(), () => {});
+     expect(Plain.serialize(editor.instance().value)).toEqual('foo ');
+   });
+ });
+diff --git a/packages/grafana-ui/src/slate-plugins/clear.ts b/packages/grafana-ui/src/slate-plugins/clear.ts
+index c711f68aff..e660fed51e 100644
+--- a/packages/grafana-ui/src/slate-plugins/clear.ts
++++ b/packages/grafana-ui/src/slate-plugins/clear.ts
+@@ -1,19 +1,17 @@
+-import { Plugin } from '@grafana/slate-react';
+-import { Editor as CoreEditor } from 'slate';
++import { Plugin } from 'slate-react';
+ 
+ // Clears the rest of the line after the caret
+ export function ClearPlugin(): Plugin {
+   return {
+-    onKeyDown(event: Event, editor: CoreEditor, next: Function) {
+-      const keyEvent = event as KeyboardEvent;
++    onKeyDown(event, editor, next) {
+       const value = editor.value;
+ 
+       if (value.selection.isExpanded) {
+         return next();
+       }
+ 
+-      if (keyEvent.key === 'k' && keyEvent.ctrlKey) {
+-        keyEvent.preventDefault();
++      if (event.key === 'k' && event.ctrlKey) {
++        event.preventDefault();
+         const text = value.anchorText.text;
+         const offset = value.selection.anchor.offset;
+         const length = text.length;
+diff --git a/packages/grafana-ui/src/slate-plugins/clipboard.ts b/packages/grafana-ui/src/slate-plugins/clipboard.ts
+index 5137bcc09e..6bbc1c3bdc 100644
+--- a/packages/grafana-ui/src/slate-plugins/clipboard.ts
++++ b/packages/grafana-ui/src/slate-plugins/clipboard.ts
+@@ -1,5 +1,4 @@
+-import { Plugin } from '@grafana/slate-react';
+-import { Editor as CoreEditor } from 'slate';
++import { Plugin } from 'slate-react';
+ 
+ const getCopiedText = (textBlocks: string[], startOffset: number, endOffset: number) => {
+   if (!textBlocks.length) {
+@@ -10,11 +9,15 @@ const getCopiedText = (textBlocks: string[], startOffset: number, endOffset: num
+   return textBlocks.join('\n').slice(startOffset, excludingLastLineLength + endOffset);
+ };
+ 
++// Remove unicode special symbol - byte order mark (BOM), U+FEFF.
++const removeBom = (str: string | undefined): string | undefined => {
++  return str?.replace(/[\uFEFF]/g, '');
++};
++
+ export function ClipboardPlugin(): Plugin {
+   const clipboardPlugin: Plugin = {
+-    onCopy(event: Event, editor: CoreEditor, next: () => any) {
+-      const clipEvent = event as ClipboardEvent;
+-      clipEvent.preventDefault();
++    onCopy(event, editor, next) {
++      event.preventDefault();
+ 
+       const { document, selection } = editor.value;
+       const {
+@@ -26,22 +29,21 @@ export function ClipboardPlugin(): Plugin {
+         .toArray()
+         .map((block) => block.text);
+ 
+-      const copiedText = getCopiedText(selectedBlocks, startOffset, endOffset);
+-      if (copiedText && clipEvent.clipboardData) {
+-        clipEvent.clipboardData.setData('Text', copiedText);
++      const copiedText = removeBom(getCopiedText(selectedBlocks, startOffset, endOffset));
++      if (copiedText && event.clipboardData) {
++        event.clipboardData.setData('Text', copiedText);
+       }
+ 
+       return true;
+     },
+ 
+-    onPaste(event: Event, editor: CoreEditor, next: () => any) {
+-      const clipEvent = event as ClipboardEvent;
+-      clipEvent.preventDefault();
+-      if (clipEvent.clipboardData) {
+-        const pastedValue = clipEvent.clipboardData.getData('Text');
+-        const lines = pastedValue.split('\n');
++    onPaste(event, editor, next) {
++      event.preventDefault();
++      if (event.clipboardData) {
++        const pastedValue = removeBom(event.clipboardData.getData('Text'));
++        const lines = pastedValue?.split('\n');
+ 
+-        if (lines.length) {
++        if (lines && lines.length) {
+           editor.insertText(lines[0]);
+           for (const line of lines.slice(1)) {
+             editor.splitBlock().insertText(line);
+@@ -55,9 +57,8 @@ export function ClipboardPlugin(): Plugin {
+ 
+   return {
+     ...clipboardPlugin,
+-    onCut(event: Event, editor: CoreEditor, next: () => any) {
+-      const clipEvent = event as ClipboardEvent;
+-      clipboardPlugin.onCopy!(clipEvent, editor, next);
++    onCut(event, editor, next) {
++      clipboardPlugin.onCopy!(event, editor, next);
+       editor.deleteAtRange(editor.value.selection);
+ 
+       return true;
+diff --git a/packages/grafana-ui/src/slate-plugins/indentation.ts b/packages/grafana-ui/src/slate-plugins/indentation.ts
+index b848ccfd82..5435640042 100644
+--- a/packages/grafana-ui/src/slate-plugins/indentation.ts
++++ b/packages/grafana-ui/src/slate-plugins/indentation.ts
+@@ -1,6 +1,7 @@
+-import { RangeJSON, Range as SlateRange, Editor as CoreEditor } from 'slate';
+-import { Plugin } from '@grafana/slate-react';
+ import { isKeyHotkey } from 'is-hotkey';
++import React from 'react';
++import { RangeJSON, Range as SlateRange } from 'slate';
++import { Editor, Plugin } from 'slate-react';
+ 
+ const isIndentLeftHotkey = isKeyHotkey('mod+[');
+ const isShiftTabHotkey = isKeyHotkey('shift+tab');
+@@ -8,7 +9,7 @@ const isIndentRightHotkey = isKeyHotkey('mod+]');
+ 
+ const SLATE_TAB = '  ';
+ 
+-const handleTabKey = (event: KeyboardEvent, editor: CoreEditor, next: Function): void => {
++const handleTabKey = (event: React.KeyboardEvent<Element>, editor: Editor, next: Function): void => {
+   const {
+     startBlock,
+     endBlock,
+@@ -30,7 +31,7 @@ const handleTabKey = (event: KeyboardEvent, editor: CoreEditor, next: Function):
+   }
+ };
+ 
+-const handleIndent = (editor: CoreEditor, indentDirection: 'left' | 'right') => {
++const handleIndent = (editor: Editor, indentDirection: 'left' | 'right') => {
+   const curSelection = editor.value.selection;
+   const selectedBlocks = editor.value.document.getLeafBlocksAtRange(curSelection).toArray();
+ 
+@@ -73,17 +74,16 @@ const handleIndent = (editor: CoreEditor, indentDirection: 'left' | 'right') =>
+ // Clears the rest of the line after the caret
+ export function IndentationPlugin(): Plugin {
+   return {
+-    onKeyDown(event: Event, editor: CoreEditor, next: Function) {
+-      const keyEvent = event as KeyboardEvent;
+-      if (isIndentLeftHotkey(keyEvent) || isShiftTabHotkey(keyEvent)) {
+-        keyEvent.preventDefault();
++    onKeyDown(event, editor, next) {
++      if (isIndentLeftHotkey(event.nativeEvent) || isShiftTabHotkey(event.nativeEvent)) {
++        event.preventDefault();
+         handleIndent(editor, 'left');
+-      } else if (isIndentRightHotkey(keyEvent)) {
+-        keyEvent.preventDefault();
++      } else if (isIndentRightHotkey(event.nativeEvent)) {
++        event.preventDefault();
+         handleIndent(editor, 'right');
+-      } else if (keyEvent.key === 'Tab') {
+-        keyEvent.preventDefault();
+-        handleTabKey(keyEvent, editor, next);
++      } else if (event.key === 'Tab') {
++        event.preventDefault();
++        handleTabKey(event, editor, next);
+       } else {
+         return next();
+       }
+diff --git a/packages/grafana-ui/src/slate-plugins/newline.ts b/packages/grafana-ui/src/slate-plugins/newline.ts
+index b987b48591..2c7e0a2259 100644
+--- a/packages/grafana-ui/src/slate-plugins/newline.ts
++++ b/packages/grafana-ui/src/slate-plugins/newline.ts
+@@ -1,5 +1,4 @@
+-import { Plugin } from '@grafana/slate-react';
+-import { Editor as CoreEditor } from 'slate';
++import { Plugin } from 'slate-react';
+ 
+ function getIndent(text: string) {
+   let offset = text.length - text.trimLeft().length;
+@@ -15,16 +14,15 @@ function getIndent(text: string) {
+ 
+ export function NewlinePlugin(): Plugin {
+   return {
+-    onKeyDown(event: Event, editor: CoreEditor, next: Function) {
+-      const keyEvent = event as KeyboardEvent;
++    onKeyDown(event, editor, next) {
+       const value = editor.value;
+ 
+       if (value.selection.isExpanded) {
+         return next();
+       }
+ 
+-      if (keyEvent.key === 'Enter') {
+-        keyEvent.preventDefault();
++      if (event.key === 'Enter') {
++        event.preventDefault();
+ 
+         const { startBlock } = value;
+         const currentLineText = startBlock.text;
+diff --git a/packages/grafana-ui/src/slate-plugins/runner.test.tsx b/packages/grafana-ui/src/slate-plugins/runner.test.tsx
+index 6041d1bc5d..58129e39d7 100644
+--- a/packages/grafana-ui/src/slate-plugins/runner.test.tsx
++++ b/packages/grafana-ui/src/slate-plugins/runner.test.tsx
+@@ -1,7 +1,8 @@
+ import Plain from 'slate-plain-serializer';
+ import React from 'react';
+-import { Editor } from '@grafana/slate-react';
+ import { shallow } from 'enzyme';
++import { Editor } from 'slate-react';
++
+ import { RunnerPlugin } from './runner';
+ 
+ describe('runner', () => {
+@@ -10,10 +11,13 @@ describe('runner', () => {
+ 
+   it('should execute query when enter with shift is pressed', () => {
+     const value = Plain.deserialize('');
+-    const editor = shallow<Editor>(<Editor value={value} />);
++    const editor = shallow(<Editor value={value} />);
+     handler(
+-      { key: 'Enter', shiftKey: true, preventDefault: () => {} } as KeyboardEvent,
+-      editor.instance() as any,
++      new window.KeyboardEvent('keydown', {
++        key: 'Enter',
++        shiftKey: true,
++      }) as any,
++      editor.instance() as Editor,
+       () => {}
+     );
+     expect(mockHandler).toBeCalled();
+diff --git a/packages/grafana-ui/src/slate-plugins/runner.ts b/packages/grafana-ui/src/slate-plugins/runner.ts
+index a326af8d25..1b1c93d340 100644
+--- a/packages/grafana-ui/src/slate-plugins/runner.ts
++++ b/packages/grafana-ui/src/slate-plugins/runner.ts
+@@ -1,16 +1,14 @@
+-import { Plugin } from '@grafana/slate-react';
+-import { Editor as CoreEditor } from 'slate';
++import React from 'react';
++import { Plugin } from 'slate-react';
+ 
+-export function RunnerPlugin({ handler }: any): Plugin {
++export function RunnerPlugin({ handler }: { handler?: (e: React.KeyboardEvent) => void }): Plugin {
+   return {
+-    onKeyDown(event: Event, editor: CoreEditor, next: Function) {
+-      const keyEvent = event as KeyboardEvent;
+-
++    onKeyDown(event, editor, next) {
+       // Handle enter
+-      if (handler && keyEvent.key === 'Enter' && (keyEvent.shiftKey || keyEvent.ctrlKey)) {
++      if (handler && event.key === 'Enter' && (event.shiftKey || event.ctrlKey)) {
+         // Submit on Enter
+-        keyEvent.preventDefault();
+-        handler(keyEvent);
++        event.preventDefault();
++        handler(event);
+         return editor;
+       }
+ 
+diff --git a/packages/grafana-ui/src/slate-plugins/selection_shortcuts.ts b/packages/grafana-ui/src/slate-plugins/selection_shortcuts.ts
+index 23211f356a..d001d4b92d 100644
+--- a/packages/grafana-ui/src/slate-plugins/selection_shortcuts.ts
++++ b/packages/grafana-ui/src/slate-plugins/selection_shortcuts.ts
+@@ -1,17 +1,14 @@
+-import { Plugin } from '@grafana/slate-react';
+-import { Editor as CoreEditor } from 'slate';
+-
+ import { isKeyHotkey } from 'is-hotkey';
++import { Plugin } from 'slate-react';
+ 
+ const isSelectLineHotkey = isKeyHotkey('mod+l');
+ 
+ // Clears the rest of the line after the caret
+ export function SelectionShortcutsPlugin(): Plugin {
+   return {
+-    onKeyDown(event: Event, editor: CoreEditor, next: () => any) {
+-      const keyEvent = event as KeyboardEvent;
+-      if (isSelectLineHotkey(keyEvent)) {
+-        keyEvent.preventDefault();
++    onKeyDown(event, editor, next) {
++      if (isSelectLineHotkey(event.nativeEvent)) {
++        event.preventDefault();
+         const { focusBlock, document } = editor.value;
+ 
+         editor.moveAnchorToStartOfBlock();
+diff --git a/packages/grafana-ui/src/slate-plugins/slate-prism/index.ts b/packages/grafana-ui/src/slate-plugins/slate-prism/index.ts
+index 475ffd33d8..2943bd4744 100644
+--- a/packages/grafana-ui/src/slate-plugins/slate-prism/index.ts
++++ b/packages/grafana-ui/src/slate-plugins/slate-prism/index.ts
+@@ -1,8 +1,9 @@
+ import Prism, { LanguageMap } from 'prismjs';
+ import { Block, Text, Decoration } from 'slate';
+-import { Plugin } from '@grafana/slate-react';
+-import Options, { OptionsFormat } from './options';
++import { Plugin } from 'slate-react';
++
+ import TOKEN_MARK from './TOKEN_MARK';
++import Options, { OptionsFormat } from './options';
+ 
+ export interface Token {
+   content: string;
+diff --git a/packages/grafana-ui/src/slate-plugins/slate-prism/options.tsx b/packages/grafana-ui/src/slate-plugins/slate-prism/options.tsx
+index 82320a5a13..6230b1113c 100644
+--- a/packages/grafana-ui/src/slate-plugins/slate-prism/options.tsx
++++ b/packages/grafana-ui/src/slate-plugins/slate-prism/options.tsx
+@@ -1,7 +1,7 @@
+ import React from 'react';
+ import { Mark, Node, Decoration } from 'slate';
+-import { Editor } from '@grafana/slate-react';
+ import { Record } from 'immutable';
++import { Editor } from 'slate-react';
+ 
+ import TOKEN_MARK from './TOKEN_MARK';
+ 
+diff --git a/packages/grafana-ui/src/slate-plugins/suggestions.tsx b/packages/grafana-ui/src/slate-plugins/suggestions.tsx
+index bfd821ba0a..c7b2a4a267 100644
+--- a/packages/grafana-ui/src/slate-plugins/suggestions.tsx
++++ b/packages/grafana-ui/src/slate-plugins/suggestions.tsx
+@@ -1,21 +1,18 @@
+ import React from 'react';
+-import debounce from 'lodash/debounce';
+-import sortBy from 'lodash/sortBy';
+-
+-import { Editor as CoreEditor } from 'slate';
+-import { Plugin as SlatePlugin } from '@grafana/slate-react';
++import { Editor, Plugin as SlatePlugin } from 'slate-react';
+ 
+ import TOKEN_MARK from './slate-prism/TOKEN_MARK';
+ import { Typeahead } from '../components/Typeahead/Typeahead';
+ import { CompletionItem, TypeaheadOutput, TypeaheadInput, SuggestionsState } from '../types/completion';
+ import { makeFragment } from '../utils/slate';
++import { debounce, sortBy } from 'lodash';
+ 
+ export const TYPEAHEAD_DEBOUNCE = 250;
+ 
+ // Commands added to the editor by this plugin.
+ interface SuggestionsPluginCommands {
+-  selectSuggestion: (suggestion: CompletionItem) => CoreEditor;
+-  applyTypeahead: (suggestion: CompletionItem) => CoreEditor;
++  selectSuggestion: (suggestion: CompletionItem) => Editor;
++  applyTypeahead: (suggestion: CompletionItem) => Editor;
+ }
+ 
+ export function SuggestionsPlugin({
+@@ -64,16 +61,15 @@ export function SuggestionsPlugin({
+       return next();
+     },
+ 
+-    onKeyDown: (event: Event, editor, next) => {
+-      const keyEvent = event as KeyboardEvent;
++    onKeyDown: (event, editor, next) => {
+       const currentSuggestions = state.groupedItems;
+ 
+       const hasSuggestions = currentSuggestions.length;
+ 
+-      switch (keyEvent.key) {
++      switch (event.key) {
+         case 'Escape': {
+           if (hasSuggestions) {
+-            keyEvent.preventDefault();
++            event.preventDefault();
+ 
+             state = {
+               ...state,
+@@ -90,16 +86,16 @@ export function SuggestionsPlugin({
+         case 'ArrowDown':
+         case 'ArrowUp':
+           if (hasSuggestions) {
+-            keyEvent.preventDefault();
+-            typeaheadRef.moveMenuIndex(keyEvent.key === 'ArrowDown' ? 1 : -1);
++            event.preventDefault();
++            typeaheadRef.moveMenuIndex(event.key === 'ArrowDown' ? 1 : -1);
+             return;
+           }
+ 
+           break;
+ 
+         case 'Enter': {
+-          if (!(keyEvent.shiftKey || keyEvent.ctrlKey) && hasSuggestions) {
+-            keyEvent.preventDefault();
++          if (!(event.shiftKey || event.ctrlKey) && hasSuggestions) {
++            event.preventDefault();
+             return typeaheadRef.insertSuggestion();
+           }
+ 
+@@ -108,7 +104,7 @@ export function SuggestionsPlugin({
+ 
+         case 'Tab': {
+           if (hasSuggestions) {
+-            keyEvent.preventDefault();
++            event.preventDefault();
+             return typeaheadRef.insertSuggestion();
+           }
+ 
+@@ -117,7 +113,7 @@ export function SuggestionsPlugin({
+ 
+         default: {
+           // Don't react on meta keys
+-          if (keyEvent.key.length === 1) {
++          if (event.key.length === 1) {
+             handleTypeaheadDebounced(editor, setState, onTypeahead, cleanText);
+           }
+           break;
+@@ -128,7 +124,7 @@ export function SuggestionsPlugin({
+     },
+ 
+     commands: {
+-      selectSuggestion: (editor: CoreEditor, suggestion: CompletionItem): CoreEditor => {
++      selectSuggestion: (editor, suggestion: CompletionItem): Editor => {
+         const suggestions = state.groupedItems;
+         if (!suggestions || !suggestions.length) {
+           return editor;
+@@ -140,11 +136,13 @@ export function SuggestionsPlugin({
+         return ed;
+       },
+ 
+-      applyTypeahead: (editor: CoreEditor, suggestion: CompletionItem): CoreEditor => {
++      applyTypeahead: (editor, suggestion: CompletionItem) => {
+         let suggestionText = suggestion.insertText || suggestion.label;
+ 
+         const preserveSuffix = suggestion.kind === 'function';
+         const move = suggestion.move || 0;
++        const moveForward = move > 0 ? move : 0;
++        const moveBackward = move < 0 ? -move : 0;
+ 
+         const { typeaheadPrefix, typeaheadText, typeaheadContext } = state;
+ 
+@@ -168,7 +166,8 @@ export function SuggestionsPlugin({
+         // If new-lines, apply suggestion as block
+         if (suggestionText.match(/\n/)) {
+           const fragment = makeFragment(suggestionText);
+-          return editor.deleteBackward(backward).deleteForward(forward).insertFragment(fragment).focus();
++          editor.deleteBackward(backward).deleteForward(forward).insertFragment(fragment).focus();
++          return editor;
+         }
+ 
+         state = {
+@@ -176,12 +175,16 @@ export function SuggestionsPlugin({
+           groupedItems: [],
+         };
+ 
+-        return editor
++        editor
++          .snapshotSelection()
+           .deleteBackward(backward)
+           .deleteForward(forward)
+           .insertText(suggestionText)
+-          .moveForward(move)
++          .moveForward(moveForward)
++          .moveBackward(moveBackward)
+           .focus();
++
++        return editor;
+       },
+     },
+ 
+@@ -201,7 +204,7 @@ export function SuggestionsPlugin({
+             prefix={state.typeaheadPrefix}
+             isOpen={!!state.groupedItems.length}
+             groupedItems={state.groupedItems}
+-            onSelectSuggestion={(editor as CoreEditor & SuggestionsPluginCommands).selectSuggestion}
++            onSelectSuggestion={(editor as Editor & SuggestionsPluginCommands).selectSuggestion}
+           />
+         </>
+       );
+@@ -210,7 +213,7 @@ export function SuggestionsPlugin({
+ }
+ 
+ const handleTypeahead = async (
+-  editor: CoreEditor,
++  editor: Editor,
+   onStateChange: (state: Partial<SuggestionsState>) => void,
+   onTypeahead?: (typeahead: TypeaheadInput) => Promise<TypeaheadOutput>,
+   cleanText?: (text: string) => string
+diff --git a/packages/grafana-ui/src/types/completion.ts b/packages/grafana-ui/src/types/completion.ts
+index b56c360faa..23359cd2b4 100644
+--- a/packages/grafana-ui/src/types/completion.ts
++++ b/packages/grafana-ui/src/types/completion.ts
+@@ -1,4 +1,5 @@
+-import { Value, Editor as CoreEditor } from 'slate';
++import { Value } from 'slate';
++import { Editor } from 'slate-react';
+ 
+ export interface CompletionItemGroup {
+   /**
+@@ -97,7 +98,7 @@ export interface TypeaheadInput {
+   wrapperClasses: string[];
+   labelKey?: string;
+   value?: Value;
+-  editor?: CoreEditor;
++  editor?: Editor;
+ }
+ 
+ export interface SuggestionsState {
+diff --git a/packages/grafana-ui/tsconfig.json b/packages/grafana-ui/tsconfig.json
+index 42f0a8b3a3..3dc91ea1f9 100644
+--- a/packages/grafana-ui/tsconfig.json
++++ b/packages/grafana-ui/tsconfig.json
+@@ -4,7 +4,6 @@
+     "declarationDir": "dist",
+     "outDir": "compiled",
+     "paths": {
+-      "@grafana/slate-react": ["slate-react"],
+       "@grafana/ui": ["."]
+     },
+     "rootDirs": [".", "stories"],
+diff --git a/packages/jaeger-ui-components/package.json b/packages/jaeger-ui-components/package.json
+index 619e46d293..7a1670560b 100644
+--- a/packages/jaeger-ui-components/package.json
++++ b/packages/jaeger-ui-components/package.json
+@@ -23,7 +23,7 @@
+     "@types/moment": "^2.13.0",
+     "@types/react-icons": "2.2.7",
+     "@types/recompose": "^0.30.7",
+-    "@types/slate-react": "0.22.5",
++    "@types/slate-react": "0.22.9",
+     "chance": "^1.0.10",
+     "classnames": "^2.2.5",
+     "combokeys": "^3.0.0",
+diff --git a/packages/jaeger-ui-components/tsconfig.json b/packages/jaeger-ui-components/tsconfig.json
+index 988ee0c241..209f3d3f21 100644
+--- a/packages/jaeger-ui-components/tsconfig.json
++++ b/packages/jaeger-ui-components/tsconfig.json
+@@ -1,9 +1,6 @@
+ {
+   "compilerOptions": {
+     "baseUrl": "node_modules/@types",
+-    "paths": {
+-      "@grafana/slate-react": ["slate-react"]
+-    },
+     "typeRoots": ["node_modules/@types"]
+   },
+   "extends": "@grafana/tsconfig",
+diff --git a/patches/slate-dev-environment+0.2.5.patch b/patches/slate-dev-environment+0.2.5.patch
+new file mode 100644
+index 0000000000..42470dc965
+--- /dev/null
++++ b/patches/slate-dev-environment+0.2.5.patch
+@@ -0,0 +1,44 @@
++diff --git a/node_modules/slate-dev-environment/dist/slate-dev-environment.js b/node_modules/slate-dev-environment/dist/slate-dev-environment.js
++index 54ba8de..173f533 100644
++--- a/node_modules/slate-dev-environment/dist/slate-dev-environment.js
+++++ b/node_modules/slate-dev-environment/dist/slate-dev-environment.js
++@@ -280,7 +280,7 @@ exports.IS_MAC = IS_MAC;
++ exports.IS_WINDOWS = IS_WINDOWS;
++ exports.ANDROID_API_VERSION = ANDROID_API_VERSION;
++ exports.HAS_INPUT_EVENTS_LEVEL_1 = HAS_INPUT_EVENTS_LEVEL_1;
++-exports.HAS_INPUT_EVENTS_LEVEL_2 = HAS_INPUT_EVENTS_LEVEL_2;
+++exports.HAS_INPUT_EVENTS_LEVEL_2 = false;
++ 
++ Object.defineProperty(exports, '__esModule', { value: true });
++ 
++diff --git a/node_modules/slate-dev-environment/dist/slate-dev-environment.min.js b/node_modules/slate-dev-environment/dist/slate-dev-environment.min.js
++index d7886c6..9ddb290 100644
++--- a/node_modules/slate-dev-environment/dist/slate-dev-environment.min.js
+++++ b/node_modules/slate-dev-environment/dist/slate-dev-environment.min.js
++@@ -1 +1 @@
++-!function(e,r){"object"==typeof exports&&"undefined"!=typeof module?r(exports):"function"==typeof define&&define.amd?define(["exports"],r):r(e.SlateDevEnvironment={})}(this,function(e){"use strict";var r="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},n="object"===("undefined"==typeof window?"undefined":r(window))&&"object"===("undefined"==typeof document?"undefined":r(document))&&9===document.nodeType,t=function(){return function(e,r){if(Array.isArray(e))return e;if(Symbol.iterator in Object(e))return function(e,r){var n=[],t=!0,o=!1,i=void 0;try{for(var a,u=e[Symbol.iterator]();!(t=(a=u.next()).done)&&(n.push(a.value),!r||n.length!==r);t=!0);}catch(e){o=!0,i=e}finally{try{!t&&u.return&&u.return()}finally{if(o)throw i}}return n}(e,r);throw new TypeError("Invalid attempt to destructure non-iterable instance")}}(),o=void 0;if(n){var i=!0,a=!1,u=void 0;try{for(var f,l=[["edge",/Edge\/([0-9\._]+)/],["chrome",/(?!Chrom.*OPR)Chrom(?:e|ium)\/([0-9\.]+)(:?\s|$)/],["firefox",/Firefox\/([0-9\.]+)(?:\s|$)/],["opera",/Opera\/([0-9\.]+)(?:\s|$)/],["opera",/OPR\/([0-9\.]+)(:?\s|$)$/],["ie",/Trident\/7\.0.*rv\:([0-9\.]+)\).*Gecko$/],["ie",/MSIE\s([0-9\.]+);.*Trident\/[4-7].0/],["ie",/MSIE\s(7\.0)/],["android",/Android\s([0-9\.]+)/],["safari",/Version\/([0-9\._]+).*Safari/]][Symbol.iterator]();!(i=(f=l.next()).done);i=!0){var d=f.value,v=t(d,2),c=v[0];if(v[1].test(window.navigator.userAgent)){o=c;break}}}catch(e){a=!0,u=e}finally{try{!i&&l.return&&l.return()}finally{if(a)throw u}}}var s=void 0;if(n){var y=!0,m=!1,p=void 0;try{for(var S,_=[["ios",/os ([\.\_\d]+) like mac os/i],["macos",/mac os x/i],["android",/android/i],["firefoxos",/mozilla\/[a-z\.\_\d]+ \((?:mobile)|(?:tablet)/i],["windows",/windows\s*(?:nt)?\s*([\.\_\d]+)/i]][Symbol.iterator]();!(y=(S=_.next()).done);y=!0){var w=S.value,I=t(w,2),b=I[0];if(I[1].test(window.navigator.userAgent)){s=b;break}}}catch(e){m=!0,p=e}finally{try{!y&&_.return&&_.return()}finally{if(m)throw p}}}var E=[];if(n){var h=!0,A=!1,x=void 0;try{for(var O,g=[["inputeventslevel1",function(e){return"inputType"in(e.InputEvent?new e.InputEvent("input"):{})}],["inputeventslevel2",function(e){var r=e.document.createElement("div");return r.contentEditable=!0,"onbeforeinput"in r}]][Symbol.iterator]();!(h=(O=g.next()).done);h=!0){var R=O.value,T=t(R,2),N=T[0];(0,T[1])(window)&&E.push(N)}}catch(e){A=!0,x=e}finally{try{!h&&g.return&&g.return()}finally{if(A)throw x}}}var D=[[/^9([.]0|)/,28],[/^8[.]1/,27],[/^8([.]0|)/,26],[/^7[.]1/,25],[/^7([.]0|)/,24],[/^6([.]0|)/,23],[/^5[.]1/,22],[/^5([.]0|)/,21],[/^4[.]4/,20]];var P="chrome"===o,V="opera"===o,$="firefox"===o,j="safari"===o,M="ie"===o,k="edge"===o,C="android"===s,F="ios"===s,L="macos"===s,H="windows"===s,z=function(){if("android"!==s)return null;var e=window.navigator.userAgent.match(/Android\s([0-9\.]+)/);if(null==e)return null;var r=e[1],n=!0,o=!1,i=void 0;try{for(var a,u=D[Symbol.iterator]();!(n=(a=u.next()).done);n=!0){var f=a.value,l=t(f,2),d=l[0],v=l[1];if(r.match(d))return v}}catch(e){o=!0,i=e}finally{try{!n&&u.return&&u.return()}finally{if(o)throw i}}return null}(),G=E.includes("inputeventslevel1"),U=E.includes("inputeventslevel2")||C&&(28===z||null===z);e.IS_CHROME=P,e.IS_OPERA=V,e.IS_FIREFOX=$,e.IS_SAFARI=j,e.IS_IE=M,e.IS_EDGE=k,e.IS_ANDROID=C,e.IS_IOS=F,e.IS_MAC=L,e.IS_WINDOWS=H,e.ANDROID_API_VERSION=z,e.HAS_INPUT_EVENTS_LEVEL_1=G,e.HAS_INPUT_EVENTS_LEVEL_2=U,Object.defineProperty(e,"__esModule",{value:!0})});
+++!function(e,r){"object"==typeof exports&&"undefined"!=typeof module?r(exports):"function"==typeof define&&define.amd?define(["exports"],r):r(e.SlateDevEnvironment={})}(this,function(e){"use strict";var r="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},n="object"===("undefined"==typeof window?"undefined":r(window))&&"object"===("undefined"==typeof document?"undefined":r(document))&&9===document.nodeType,t=function(){return function(e,r){if(Array.isArray(e))return e;if(Symbol.iterator in Object(e))return function(e,r){var n=[],t=!0,o=!1,i=void 0;try{for(var a,u=e[Symbol.iterator]();!(t=(a=u.next()).done)&&(n.push(a.value),!r||n.length!==r);t=!0);}catch(e){o=!0,i=e}finally{try{!t&&u.return&&u.return()}finally{if(o)throw i}}return n}(e,r);throw new TypeError("Invalid attempt to destructure non-iterable instance")}}(),o=void 0;if(n){var i=!0,a=!1,u=void 0;try{for(var f,l=[["edge",/Edge\/([0-9\._]+)/],["chrome",/(?!Chrom.*OPR)Chrom(?:e|ium)\/([0-9\.]+)(:?\s|$)/],["firefox",/Firefox\/([0-9\.]+)(?:\s|$)/],["opera",/Opera\/([0-9\.]+)(?:\s|$)/],["opera",/OPR\/([0-9\.]+)(:?\s|$)$/],["ie",/Trident\/7\.0.*rv\:([0-9\.]+)\).*Gecko$/],["ie",/MSIE\s([0-9\.]+);.*Trident\/[4-7].0/],["ie",/MSIE\s(7\.0)/],["android",/Android\s([0-9\.]+)/],["safari",/Version\/([0-9\._]+).*Safari/]][Symbol.iterator]();!(i=(f=l.next()).done);i=!0){var d=f.value,v=t(d,2),c=v[0];if(v[1].test(window.navigator.userAgent)){o=c;break}}}catch(e){a=!0,u=e}finally{try{!i&&l.return&&l.return()}finally{if(a)throw u}}}var s=void 0;if(n){var y=!0,m=!1,p=void 0;try{for(var S,_=[["ios",/os ([\.\_\d]+) like mac os/i],["macos",/mac os x/i],["android",/android/i],["firefoxos",/mozilla\/[a-z\.\_\d]+ \((?:mobile)|(?:tablet)/i],["windows",/windows\s*(?:nt)?\s*([\.\_\d]+)/i]][Symbol.iterator]();!(y=(S=_.next()).done);y=!0){var w=S.value,I=t(w,2),b=I[0];if(I[1].test(window.navigator.userAgent)){s=b;break}}}catch(e){m=!0,p=e}finally{try{!y&&_.return&&_.return()}finally{if(m)throw p}}}var E=[];if(n){var h=!0,A=!1,x=void 0;try{for(var O,g=[["inputeventslevel1",function(e){return"inputType"in(e.InputEvent?new e.InputEvent("input"):{})}],["inputeventslevel2",function(e){var r=e.document.createElement("div");return r.contentEditable=!0,"onbeforeinput"in r}]][Symbol.iterator]();!(h=(O=g.next()).done);h=!0){var R=O.value,T=t(R,2),N=T[0];(0,T[1])(window)&&E.push(N)}}catch(e){A=!0,x=e}finally{try{!h&&g.return&&g.return()}finally{if(A)throw x}}}var D=[[/^9([.]0|)/,28],[/^8[.]1/,27],[/^8([.]0|)/,26],[/^7[.]1/,25],[/^7([.]0|)/,24],[/^6([.]0|)/,23],[/^5[.]1/,22],[/^5([.]0|)/,21],[/^4[.]4/,20]];var P="chrome"===o,V="opera"===o,$="firefox"===o,j="safari"===o,M="ie"===o,k="edge"===o,C="android"===s,F="ios"===s,L="macos"===s,H="windows"===s,z=function(){if("android"!==s)return null;var e=window.navigator.userAgent.match(/Android\s([0-9\.]+)/);if(null==e)return null;var r=e[1],n=!0,o=!1,i=void 0;try{for(var a,u=D[Symbol.iterator]();!(n=(a=u.next()).done);n=!0){var f=a.value,l=t(f,2),d=l[0],v=l[1];if(r.match(d))return v}}catch(e){o=!0,i=e}finally{try{!n&&u.return&&u.return()}finally{if(o)throw i}}return null}(),G=E.includes("inputeventslevel1"),U=E.includes("inputeventslevel2")||C&&(28===z||null===z);e.IS_CHROME=P,e.IS_OPERA=V,e.IS_FIREFOX=$,e.IS_SAFARI=j,e.IS_IE=M,e.IS_EDGE=k,e.IS_ANDROID=C,e.IS_IOS=F,e.IS_MAC=L,e.IS_WINDOWS=H,e.ANDROID_API_VERSION=z,e.HAS_INPUT_EVENTS_LEVEL_1=G,e.HAS_INPUT_EVENTS_LEVEL_2=false,Object.defineProperty(e,"__esModule",{value:!0})});
++diff --git a/node_modules/slate-dev-environment/lib/slate-dev-environment.es.js b/node_modules/slate-dev-environment/lib/slate-dev-environment.es.js
++index 91fcf8e..520588b 100644
++--- a/node_modules/slate-dev-environment/lib/slate-dev-environment.es.js
+++++ b/node_modules/slate-dev-environment/lib/slate-dev-environment.es.js
++@@ -258,7 +258,7 @@ var IS_WINDOWS = os === 'windows';
++ var ANDROID_API_VERSION = getAndroidApiVersion();
++ 
++ var HAS_INPUT_EVENTS_LEVEL_1 = features.includes('inputeventslevel1');
++-var HAS_INPUT_EVENTS_LEVEL_2 = features.includes('inputeventslevel2') || IS_ANDROID && (ANDROID_API_VERSION === 28 || ANDROID_API_VERSION === null);
+++var HAS_INPUT_EVENTS_LEVEL_2 = false;
++ 
++ export { IS_CHROME, IS_OPERA, IS_FIREFOX, IS_SAFARI, IS_IE, IS_EDGE, IS_ANDROID, IS_IOS, IS_MAC, IS_WINDOWS, ANDROID_API_VERSION, HAS_INPUT_EVENTS_LEVEL_1, HAS_INPUT_EVENTS_LEVEL_2 };
++ //# sourceMappingURL=slate-dev-environment.es.js.map
++diff --git a/node_modules/slate-dev-environment/lib/slate-dev-environment.js b/node_modules/slate-dev-environment/lib/slate-dev-environment.js
++index 4fafbdd..13082d4 100644
++--- a/node_modules/slate-dev-environment/lib/slate-dev-environment.js
+++++ b/node_modules/slate-dev-environment/lib/slate-dev-environment.js
++@@ -278,5 +278,5 @@ exports.IS_MAC = IS_MAC;
++ exports.IS_WINDOWS = IS_WINDOWS;
++ exports.ANDROID_API_VERSION = ANDROID_API_VERSION;
++ exports.HAS_INPUT_EVENTS_LEVEL_1 = HAS_INPUT_EVENTS_LEVEL_1;
++-exports.HAS_INPUT_EVENTS_LEVEL_2 = HAS_INPUT_EVENTS_LEVEL_2;
+++exports.HAS_INPUT_EVENTS_LEVEL_2 = false;
++ //# sourceMappingURL=slate-dev-environment.js.map
+diff --git a/public/app/features/explore/slate-plugins/prism/index.tsx b/public/app/features/explore/slate-plugins/prism/index.tsx
+index 990cda226d..df349825f4 100644
+--- a/public/app/features/explore/slate-plugins/prism/index.tsx
++++ b/public/app/features/explore/slate-plugins/prism/index.tsx
+@@ -1,7 +1,7 @@
+ import React from 'react';
+ import Prism from 'prismjs';
+ import { Decoration } from 'slate';
+-import { Editor } from '@grafana/slate-react';
++import { Editor } from 'slate-react';
+ 
+ const TOKEN_MARK = 'prism-token';
+ 
+diff --git a/public/app/features/plugins/plugin_loader.ts b/public/app/features/plugins/plugin_loader.ts
+index dbe0dc6c98..8b996b1ac4 100644
+--- a/public/app/features/plugins/plugin_loader.ts
++++ b/public/app/features/plugins/plugin_loader.ts
+@@ -8,15 +8,12 @@ import jquery from 'jquery';
+ // Experimental module exports
+ import prismjs from 'prismjs';
+ import slate from 'slate';
+-// @ts-ignore
+-import slateReact from '@grafana/slate-react';
+-// @ts-ignore
++import slateReact from 'slate-react';
+ import slatePlain from 'slate-plain-serializer';
+ import react from 'react';
+ import reactDom from 'react-dom';
+ import * as reactRedux from 'react-redux';
+ import * as redux from 'redux';
+-
+ import config from 'app/core/config';
+ import TimeSeries from 'app/core/time_series2';
+ import TableModel from 'app/core/table_model';
+@@ -94,7 +91,8 @@ exposeToPlugin('rxjs/operators', rxjsOperators);
+ // Experimental modules
+ exposeToPlugin('prismjs', prismjs);
+ exposeToPlugin('slate', slate);
+-exposeToPlugin('@grafana/slate-react', slateReact);
++exposeToPlugin('slate-react', slateReact);
++exposeToPlugin('@grafana/slate-react', slateReact); // for backwards compatibility with older plugins
+ exposeToPlugin('slate-plain-serializer', slatePlain);
+ exposeToPlugin('react', react);
+ exposeToPlugin('react-dom', reactDom);
+diff --git a/public/app/plugins/datasource/cloudwatch/components/LogsQueryField.tsx b/public/app/plugins/datasource/cloudwatch/components/LogsQueryField.tsx
+index 4badb8f16d..e7f9075e60 100644
+--- a/public/app/plugins/datasource/cloudwatch/components/LogsQueryField.tsx
++++ b/public/app/plugins/datasource/cloudwatch/components/LogsQueryField.tsx
+@@ -17,7 +17,8 @@ import {
+ 
+ // Utils & Services
+ // dom also includes Element polyfills
+-import { Editor, Node, Plugin } from 'slate';
++import { Node, Plugin } from 'slate';
++import { Editor } from 'slate-react';
+ import syntax from '../syntax';
+ 
+ // Types
+@@ -89,7 +90,7 @@ export class CloudWatchLogsQueryField extends React.PureComponent<CloudWatchLogs
+     hint: undefined,
+   };
+ 
+-  plugins: Plugin[];
++  plugins: Array<Plugin<Editor>>;
+ 
+   constructor(props: CloudWatchLogsQueryFieldProps, context: React.Context<any>) {
+     super(props, context);
+diff --git a/public/app/plugins/datasource/grafana-azure-monitor-datasource/editor/KustoQueryField.tsx b/public/app/plugins/datasource/grafana-azure-monitor-datasource/editor/KustoQueryField.tsx
+index f8a1625e7f..8b060e04b2 100644
+--- a/public/app/plugins/datasource/grafana-azure-monitor-datasource/editor/KustoQueryField.tsx
++++ b/public/app/plugins/datasource/grafana-azure-monitor-datasource/editor/KustoQueryField.tsx
+@@ -4,7 +4,7 @@ import Plain from 'slate-plain-serializer';
+ import QueryField from './query_field';
+ import debounce from 'lodash/debounce';
+ import { DOMUtil } from '@grafana/ui';
+-import { Editor as CoreEditor } from 'slate';
++import { Editor } from 'slate-react';
+ 
+ import { KEYWORDS, functionTokens, operatorTokens, grafanaMacros } from './kusto/kusto';
+ // import '../sass/editor.base.scss';
+@@ -196,7 +196,7 @@ export default class KustoQueryField extends QueryField {
+     }
+   };
+ 
+-  applyTypeahead = (editor: CoreEditor, suggestion: { text: any; type: string; deleteBackwards: any }): CoreEditor => {
++  applyTypeahead = (editor: Editor, suggestion: { text: any; type: string; deleteBackwards: any }): Editor => {
+     const { typeaheadPrefix, typeaheadContext, typeaheadText } = this.state;
+     let suggestionText = suggestion.text || suggestion;
+     const move = 0;
+diff --git a/public/app/plugins/datasource/grafana-azure-monitor-datasource/editor/query_field.tsx b/public/app/plugins/datasource/grafana-azure-monitor-datasource/editor/query_field.tsx
+index 74c66313ae..0723197688 100644
+--- a/public/app/plugins/datasource/grafana-azure-monitor-datasource/editor/query_field.tsx
++++ b/public/app/plugins/datasource/grafana-azure-monitor-datasource/editor/query_field.tsx
+@@ -3,8 +3,8 @@ import { BracesPlugin, ClearPlugin, RunnerPlugin, NewlinePlugin } from '@grafana
+ import Typeahead from './typeahead';
+ import { getKeybindingSrv, KeybindingSrv } from 'app/core/services/keybindingSrv';
+ 
+-import { Block, Document, Text, Value, Editor as CoreEditor } from 'slate';
+-import { Editor } from '@grafana/slate-react';
++import { Block, Document, Text, Value } from 'slate';
++import { Editor } from 'slate-react';
+ import Plain from 'slate-plain-serializer';
+ import ReactDOM from 'react-dom';
+ import React from 'react';
+@@ -111,9 +111,8 @@ class QueryField extends React.Component<any, any> {
+     }
+   };
+ 
+-  onKeyDown = (event: Event, editor: CoreEditor, next: Function) => {
++  onKeyDown = (keyboardEvent: React.KeyboardEvent<Element>, editor: Editor, next: Function) => {
+     const { typeaheadIndex, suggestions } = this.state;
+-    const keyboardEvent = event as KeyboardEvent;
+ 
+     switch (keyboardEvent.key) {
+       case 'Escape': {
+@@ -186,7 +185,7 @@ class QueryField extends React.Component<any, any> {
+   };
+ 
+   applyTypeahead = (
+-    editor?: CoreEditor,
++    editor?: Editor,
+     suggestion?: { text: any; type: string; deleteBackwards: any }
+   ): { value: Value } => {
+     return { value: new Value() };
+@@ -204,7 +203,7 @@ class QueryField extends React.Component<any, any> {
+     );
+   };
+ 
+-  handleBlur = (event: Event, editor: CoreEditor, next: Function) => {
++  handleBlur = (event: React.FocusEvent<Element>, editor: Editor, next: Function) => {
+     const { onBlur } = this.props;
+     // If we dont wait here, menu clicks wont work because the menu
+     // will be gone.
+@@ -216,7 +215,7 @@ class QueryField extends React.Component<any, any> {
+     return next();
+   };
+ 
+-  handleFocus = (event: Event, editor: CoreEditor, next: Function) => {
++  handleFocus = (event: React.FocusEvent<Element>, editor: Editor, next: Function) => {
+     const { onFocus } = this.props;
+     if (onFocus) {
+       onFocus();
+diff --git a/public/app/plugins/datasource/loki/components/LokiQueryFieldForm.tsx b/public/app/plugins/datasource/loki/components/LokiQueryFieldForm.tsx
+index 1da18e0e76..6567f12a8b 100644
+--- a/public/app/plugins/datasource/loki/components/LokiQueryFieldForm.tsx
++++ b/public/app/plugins/datasource/loki/components/LokiQueryFieldForm.tsx
+@@ -15,6 +15,7 @@ import {
+ // Utils & Services
+ // dom also includes Element polyfills
+ import { Plugin, Node } from 'slate';
++import { Editor } from 'slate-react';
+ import { LokiLabelBrowser } from './LokiLabelBrowser';
+ 
+ // Types
+@@ -75,7 +76,7 @@ interface LokiQueryFieldFormState {
+ }
+ 
+ export class LokiQueryFieldForm extends React.PureComponent<LokiQueryFieldFormProps, LokiQueryFieldFormState> {
+-  plugins: Plugin[];
++  plugins: Array<Plugin<Editor>>;
+ 
+   constructor(props: LokiQueryFieldFormProps) {
+     super(props);
+diff --git a/public/app/plugins/datasource/prometheus/components/PromQueryField.tsx b/public/app/plugins/datasource/prometheus/components/PromQueryField.tsx
+index ac997ec297..527df9672f 100644
+--- a/public/app/plugins/datasource/prometheus/components/PromQueryField.tsx
++++ b/public/app/plugins/datasource/prometheus/components/PromQueryField.tsx
+@@ -1,7 +1,8 @@
+ import _ from 'lodash';
+ import React, { ReactNode } from 'react';
+-
+ import { Plugin } from 'slate';
++import { Editor } from 'slate-react';
++
+ import {
+   ButtonCascader,
+   CascaderOption,
+@@ -133,8 +134,8 @@ interface PromQueryFieldState {
+ }
+ 
+ class PromQueryField extends React.PureComponent<PromQueryFieldProps, PromQueryFieldState> {
+-  plugins: Plugin[];
+-  languageProviderInitializationPromise: CancelablePromise<any>;
++  plugins: Array<Plugin<Editor>>;
++  declare languageProviderInitializationPromise: CancelablePromise<any>;
+ 
+   constructor(props: PromQueryFieldProps, context: React.Context<any>) {
+     super(props, context);
+diff --git a/tsconfig.json b/tsconfig.json
+index fc876b4b46..3ecf85d40f 100644
+--- a/tsconfig.json
++++ b/tsconfig.json
+@@ -4,7 +4,6 @@
+     "baseUrl": "public/",
+     "outDir": "public/dist",
+     "paths": {
+-      "@grafana/slate-react": ["../node_modules/@types/slate-react"],
+       "app": ["app/"],
+       "sass": ["sass/"]
+     },
+diff --git a/yarn.lock b/yarn.lock
+index c17e6153be..794f359af2 100644
+--- a/yarn.lock
++++ b/yarn.lock
+@@ -3451,28 +3451,6 @@
+     prettier "2.2.1"
+     typescript "4.1.3"
+ 
+-"@grafana/slate-react@0.22.9-grafana":
+-  version "0.22.9-grafana"
+-  resolved "https://registry.yarnpkg.com/@grafana/slate-react/-/slate-react-0.22.9-grafana.tgz#07f35f0ffc018f616b9f82fa6e5ba65fae75c6a0"
+-  integrity sha512-9NYjwabVOUQ/e4Y/Wm+sgePM65rb/gju59D52t4O42HsIm9exXv+SLajEBF/HiLHzuH5V+5uuHajbzv0vuE2VA==
+-  dependencies:
+-    debug "^3.1.0"
+-    get-window "^1.1.1"
+-    is-window "^1.0.2"
+-    lodash "^4.1.1"
+-    memoize-one "^4.0.0"
+-    prop-types "^15.5.8"
+-    react-immutable-proptypes "^2.1.0"
+-    selection-is-backward "^1.0.0"
+-    slate-base64-serializer "^0.2.111"
+-    slate-dev-environment "^0.2.2"
+-    slate-hotkeys "^0.2.9"
+-    slate-plain-serializer "^0.7.10"
+-    slate-prop-types "^0.5.41"
+-    slate-react-placeholder "^0.2.8"
+-    tiny-invariant "^1.0.1"
+-    tiny-warning "^0.0.3"
+-
+ "@grafana/tsconfig@^1.0.0-rc1":
+   version "1.0.0-rc1"
+   resolved "https://registry.yarnpkg.com/@grafana/tsconfig/-/tsconfig-1.0.0-rc1.tgz#d07ea16755a50cae21000113f30546b61647a200"
+@@ -6841,34 +6819,26 @@
+   resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.2.tgz#a811b8c18e2babab7d542b3365887ae2e4d9de47"
+   integrity sha512-7EJYyKTL7tFR8+gDbB6Wwz/arpGa0Mywk1TJbNzKzHtzbwVmY4HR9WqS5VV7dsBUKQmPNr192jHr/VpBluj/hg==
+ 
+-"@types/slate-plain-serializer@0.6.1":
+-  version "0.6.1"
+-  resolved "https://registry.yarnpkg.com/@types/slate-plain-serializer/-/slate-plain-serializer-0.6.1.tgz#c392ce51621f7c55df0976f161dcfca18bd559ee"
+-  integrity sha512-5meyKFvmWH1T02j2dbAaY8kn/FNofxP79jV3TsfuLsUIeHkON5CroBxAyrgkYF4vHp+MVWZddI36Yvwl7Y0Feg==
++"@types/slate-plain-serializer@0.7.2":
++  version "0.7.2"
++  resolved "https://registry.yarnpkg.com/@types/slate-plain-serializer/-/slate-plain-serializer-0.7.2.tgz#e95c073526d6f737bf136e722a154ca8d5359dee"
++  integrity sha512-pscI7YAnK3yHpiVCGkKeBRCh0JIjjktdY4Wxp7L2jPQnK04uw7BTyH9zhFKx7NZ5OPfmJNZekhYHyvfzKP5mYQ==
+   dependencies:
+     "@types/slate" "*"
+ 
+-"@types/slate-react@0.22.5":
+-  version "0.22.5"
+-  resolved "https://registry.yarnpkg.com/@types/slate-react/-/slate-react-0.22.5.tgz#a10796758aa6b3133e1c777959facbf8806959f7"
+-  integrity sha512-WKJic5LlNRNUCnD6lEdlOZCcXWoDN8Ais2CmwVMn8pdt5Kh8hJsTYhXawNxOShPIOLVB+G+aVZNAXAAubEOpaw==
++"@types/slate-react@0.22.9":
++  version "0.22.9"
++  resolved "https://registry.yarnpkg.com/@types/slate-react/-/slate-react-0.22.9.tgz#9d7ad55fc10f408f02ca5a81bf4e7d5d88ef3d16"
++  integrity sha512-x8u/mpQhxmzxlwGzM1GLsGMTSRtNO7yjtoqo23k5nZzPrz5iuUdtmtlmxjHzl2x3hBE7KQUDn5JhyuUSBLtxVQ==
+   dependencies:
+     "@types/react" "*"
+     "@types/slate" "*"
+     immutable "^3.8.2"
+ 
+-"@types/slate@*":
+-  version "0.47.2"
+-  resolved "https://registry.yarnpkg.com/@types/slate/-/slate-0.47.2.tgz#54c57c223919bb70b3047600ab6b0ccf800bff77"
+-  integrity sha512-1qwuAtuJ2Tnhewr2tz3OsDeM9xIC1ttTkBuSuf2P4Dy7K9I/I8HVeVowpo8k2vzVX7UMkc3OHo0RpC7V6pWCBw==
+-  dependencies:
+-    "@types/react" "*"
+-    immutable "^3.8.2"
+-
+-"@types/slate@0.47.1":
+-  version "0.47.1"
+-  resolved "https://registry.yarnpkg.com/@types/slate/-/slate-0.47.1.tgz#6c66f82df085c764039eea2229be763f7e1906fd"
+-  integrity sha512-2ZlnWI6/RYMXxeGFIeZtvmaXAeYAJh4ZVumziqVl77/liNEi9hOwkUTU2zFu+j/z21v385I2WVPl8sgadxfzXg==
++"@types/slate@*", "@types/slate@0.47.9":
++  version "0.47.9"
++  resolved "https://registry.yarnpkg.com/@types/slate/-/slate-0.47.9.tgz#ce212ba09bb2c0de470b59b496efeac739eff1b4"
++  integrity sha512-KzC0iNuZJkiKx0dMAC9PBF6TXZNd0l3hqVCF5/7GwCEnLDx6VsETAedAi4OjRpzObvL4x7n8ZS51+sgXHn/HvQ==
+   dependencies:
+     "@types/react" "*"
+     immutable "^3.8.2"
+@@ -7568,6 +7538,11 @@
+   resolved "https://registry.yarnpkg.com/@xtuc/long/-/long-4.2.2.tgz#d291c6a4e97989b5c61d9acf396ae4fe133a718d"
+   integrity sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==
+ 
++"@yarnpkg/lockfile@^1.1.0":
++  version "1.1.0"
++  resolved "https://registry.yarnpkg.com/@yarnpkg/lockfile/-/lockfile-1.1.0.tgz#e77a97fbd345b76d83245edcd17d393b1b41fb31"
++  integrity sha512-GpSwvyXOcOOlV70vbnzjj4fW5xW/FdUF6nQEt1ENy7m4ZCczi1+/buVUPAqmGfqznsORNFzUMjctTIp8a9tuCQ==
++
+ "@zkochan/cmd-shim@^3.1.0":
+   version "3.1.0"
+   resolved "https://registry.yarnpkg.com/@zkochan/cmd-shim/-/cmd-shim-3.1.0.tgz#2ab8ed81f5bb5452a85f25758eb9b8681982fd2e"
+@@ -9566,17 +9541,7 @@ caniuse-db@1.0.30000772:
+   resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000772.tgz#51aae891768286eade4a3d8319ea76d6a01b512b"
+   integrity sha1-UarokXaChureSj2DGep21qAbUSs=
+ 
+-caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001173:
+-  version "1.0.30001299"
+-  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001299.tgz"
+-  integrity sha512-iujN4+x7QzqA2NCSrS5VUy+4gLmRd4xv6vbBBsmfVqTx8bLAD8097euLqQgKxSVLvxjSDcvF1T/i9ocgnUFexw==
+-
+-caniuse-lite@^1.0.30000981, caniuse-lite@^1.0.30001020, caniuse-lite@^1.0.30001035, caniuse-lite@^1.0.30001093:
+-  version "1.0.30001299"
+-  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001299.tgz"
+-  integrity sha512-iujN4+x7QzqA2NCSrS5VUy+4gLmRd4xv6vbBBsmfVqTx8bLAD8097euLqQgKxSVLvxjSDcvF1T/i9ocgnUFexw==
+-
+-caniuse-lite@^1.0.30001109:
++caniuse-lite@^1.0.0, caniuse-lite@^1.0.30000981, caniuse-lite@^1.0.30001020, caniuse-lite@^1.0.30001035, caniuse-lite@^1.0.30001093, caniuse-lite@^1.0.30001109, caniuse-lite@^1.0.30001173:
+   version "1.0.30001299"
+   resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001299.tgz"
+   integrity sha512-iujN4+x7QzqA2NCSrS5VUy+4gLmRd4xv6vbBBsmfVqTx8bLAD8097euLqQgKxSVLvxjSDcvF1T/i9ocgnUFexw==
+@@ -13658,6 +13623,13 @@ find-versions@^3.2.0:
+   dependencies:
+     semver-regex "^2.0.0"
+ 
++find-yarn-workspace-root@^2.0.0:
++  version "2.0.0"
++  resolved "https://registry.yarnpkg.com/find-yarn-workspace-root/-/find-yarn-workspace-root-2.0.0.tgz#f47fb8d239c900eb78179aa81b66673eac88f7bd"
++  integrity sha512-1IMnbjt4KzsQfnhnzNd8wUEgXZ44IzZaZmnLYx7D5FZlaHt2gW20Cri8Q+E/t5tIj4+epTBub+2Zxu/vNILzqQ==
++  dependencies:
++    micromatch "^4.0.2"
++
+ findup-sync@3.0.0:
+   version "3.0.0"
+   resolved "https://registry.yarnpkg.com/findup-sync/-/findup-sync-3.0.0.tgz#17b108f9ee512dfb7a5c7f3c8b27ea9e1a9c08d1"
+@@ -13873,6 +13845,15 @@ fs-extra@^3.0.1:
+     jsonfile "^3.0.0"
+     universalify "^0.1.0"
+ 
++fs-extra@^7.0.1, fs-extra@~7.0.1:
++  version "7.0.1"
++  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-7.0.1.tgz#4f189c44aa123b895f722804f55ea23eadc348e9"
++  integrity sha512-YJDaCJZEnBmcbw13fvdAM9AwNOJwOzrE4pqMqBq5nFiEqXUqHwlK4B+3pUw6JNvfSPtX05xFHtYy/1ni01eGCw==
++  dependencies:
++    graceful-fs "^4.1.2"
++    jsonfile "^4.0.0"
++    universalify "^0.1.0"
++
+ fs-extra@^9.0.0:
+   version "9.0.1"
+   resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-9.0.1.tgz#910da0062437ba4c39fedd863f1675ccfefcb9fc"
+@@ -13893,15 +13874,6 @@ fs-extra@^9.0.1:
+     jsonfile "^6.0.1"
+     universalify "^2.0.0"
+ 
+-fs-extra@~7.0.1:
+-  version "7.0.1"
+-  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-7.0.1.tgz#4f189c44aa123b895f722804f55ea23eadc348e9"
+-  integrity sha512-YJDaCJZEnBmcbw13fvdAM9AwNOJwOzrE4pqMqBq5nFiEqXUqHwlK4B+3pUw6JNvfSPtX05xFHtYy/1ni01eGCw==
+-  dependencies:
+-    graceful-fs "^4.1.2"
+-    jsonfile "^4.0.0"
+-    universalify "^0.1.0"
+-
+ fs-minipass@^1.2.5:
+   version "1.2.7"
+   resolved "https://registry.yarnpkg.com/fs-minipass/-/fs-minipass-1.2.7.tgz#ccff8570841e7fe4265693da88936c55aed7f7c7"
+@@ -17154,6 +17126,13 @@ kind-of@^6.0.0, kind-of@^6.0.2, kind-of@^6.0.3:
+   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.3.tgz#07c05034a6c349fa06e24fa35aa76db4580ce4dd"
+   integrity sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==
+ 
++klaw-sync@^6.0.0:
++  version "6.0.0"
++  resolved "https://registry.yarnpkg.com/klaw-sync/-/klaw-sync-6.0.0.tgz#1fd2cfd56ebb6250181114f0a581167099c2b28c"
++  integrity sha512-nIeuVSzdCCs6TDPTqI8w1Yre34sSq7AkZ4B3sfOBbI2CgVSB4Du4aLQijFU2+lhAFCwt9+42Hel6lQNIv6AntQ==
++  dependencies:
++    graceful-fs "^4.1.11"
++
+ klaw@^1.0.0:
+   version "1.3.1"
+   resolved "https://registry.yarnpkg.com/klaw/-/klaw-1.3.1.tgz#4088433b46b3b1ba259d78785d8e96f73ba02439"
+@@ -19312,6 +19291,14 @@ open@^7.0.3:
+     is-docker "^2.0.0"
+     is-wsl "^2.1.1"
+ 
++open@^7.4.2:
++  version "7.4.2"
++  resolved "https://registry.yarnpkg.com/open/-/open-7.4.2.tgz#b8147e26dcf3e426316c730089fd71edd29c2321"
++  integrity sha512-MVHddDVweXZF3awtlAS+6pgKLlm/JgxZ90+/NBurBoQctVOOB/zDdVjcyPzQ+0laDGbsWgrRkflI65sQeOgT9Q==
++  dependencies:
++    is-docker "^2.0.0"
++    is-wsl "^2.1.1"
++
+ opencollective-postinstall@^2.0.2:
+   version "2.0.2"
+   resolved "https://registry.yarnpkg.com/opencollective-postinstall/-/opencollective-postinstall-2.0.2.tgz#5657f1bede69b6e33a45939b061eb53d3c6c3a89"
+@@ -19790,6 +19777,25 @@ pascalcase@^0.1.1:
+   resolved "https://registry.yarnpkg.com/pascalcase/-/pascalcase-0.1.1.tgz#b363e55e8006ca6fe21784d2db22bd15d7917f14"
+   integrity sha1-s2PlXoAGym/iF4TS2yK9FdeRfxQ=
+ 
++patch-package@^6.4.7:
++  version "6.4.7"
++  resolved "https://registry.yarnpkg.com/patch-package/-/patch-package-6.4.7.tgz#2282d53c397909a0d9ef92dae3fdeb558382b148"
++  integrity sha512-S0vh/ZEafZ17hbhgqdnpunKDfzHQibQizx9g8yEf5dcVk3KOflOfdufRXQX8CSEkyOQwuM/bNz1GwKvFj54kaQ==
++  dependencies:
++    "@yarnpkg/lockfile" "^1.1.0"
++    chalk "^2.4.2"
++    cross-spawn "^6.0.5"
++    find-yarn-workspace-root "^2.0.0"
++    fs-extra "^7.0.1"
++    is-ci "^2.0.0"
++    klaw-sync "^6.0.0"
++    minimist "^1.2.0"
++    open "^7.4.2"
++    rimraf "^2.6.3"
++    semver "^5.6.0"
++    slash "^2.0.0"
++    tmp "^0.0.33"
++
+ path-browserify@0.0.1:
+   version "0.0.1"
+   resolved "https://registry.yarnpkg.com/path-browserify/-/path-browserify-0.0.1.tgz#e6c4ddd7ed3aa27c68a20cc4e50e1a4ee83bbc4a"
+@@ -20722,6 +20728,11 @@ postcss@^7.0.23, postcss@^7.0.26:
+     source-map "^0.6.1"
+     supports-color "^6.1.0"
+ 
++postinstall-postinstall@^2.1.0:
++  version "2.1.0"
++  resolved "https://registry.yarnpkg.com/postinstall-postinstall/-/postinstall-postinstall-2.1.0.tgz#4f7f77441ef539d1512c40bd04c71b06a4704ca3"
++  integrity sha512-7hQX6ZlZXIoRiWNrbMQaLzUUfH+sSx39u8EJ9HYuDc1kLo9IXKWjM5RSquZN1ad5GnH8CGFM78fsAAQi3OKEEQ==
++
+ power-assert-context-formatter@^1.0.7:
+   version "1.2.0"
+   resolved "https://registry.yarnpkg.com/power-assert-context-formatter/-/power-assert-context-formatter-1.2.0.tgz#8fbe72692288ec5a7203cdf215c8b838a6061d2a"
+@@ -23739,17 +23750,17 @@ slash@^3.0.0:
+   resolved "https://registry.yarnpkg.com/slash/-/slash-3.0.0.tgz#6539be870c165adbd5240220dbe361f1bc4d4634"
+   integrity sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==
+ 
+-slate-base64-serializer@^0.2.111:
+-  version "0.2.111"
+-  resolved "https://registry.yarnpkg.com/slate-base64-serializer/-/slate-base64-serializer-0.2.111.tgz#22ba7d32aa4650f6bbd25c26ffe11f5d021959d6"
+-  integrity sha512-pEsbxz4msVSCCCkn7rX+lHXxUj/oddcR4VsIYwWeQQLm9Uw7Ovxja4rQ/hVFcQqoU2DIjITRwBR9pv3RyS+PZQ==
++slate-base64-serializer@^0.2.112:
++  version "0.2.115"
++  resolved "https://registry.yarnpkg.com/slate-base64-serializer/-/slate-base64-serializer-0.2.115.tgz#438e051959bde013b50507f3144257e74039ff7f"
++  integrity sha512-GnLV7bUW/UQ5j7rVIxCU5zdB6NOVsEU6YWsCp68dndIjSGTGLaQv2+WwV3NcnrGGZEYe5qgo33j2QWrPws2C1A==
+   dependencies:
+     isomorphic-base64 "^1.0.2"
+ 
+-slate-dev-environment@^0.2.2:
+-  version "0.2.2"
+-  resolved "https://registry.yarnpkg.com/slate-dev-environment/-/slate-dev-environment-0.2.2.tgz#bd8946e1fe4cf5447060c84a362a1d026ed8b77f"
+-  integrity sha512-JZ09llrRQu6JUsLJCUlGC0lB1r1qIAabAkSd454iyYBq6lDuY//Bypi3Jo8yzIfzZ4+mRLdQvl9e8MbeM9l48Q==
++slate-dev-environment@0.2.5, slate-dev-environment@^0.2.2:
++  version "0.2.5"
++  resolved "https://registry.yarnpkg.com/slate-dev-environment/-/slate-dev-environment-0.2.5.tgz#481b6906fde5becc390db7c14edf97a4bb0029f2"
++  integrity sha512-oLD8Fclv/RqrDv6RYfN2CRzNcRXsUB99Qgcw5L/njTjxAdDPguV6edQ3DgUG9Q2pLFLhI15DwsKClzVfFzfwGQ==
+   dependencies:
+     is-in-browser "^1.1.3"
+ 
+@@ -23761,25 +23772,52 @@ slate-hotkeys@^0.2.9:
+     is-hotkey "0.1.4"
+     slate-dev-environment "^0.2.2"
+ 
+-slate-plain-serializer@0.7.10, slate-plain-serializer@^0.7.10:
+-  version "0.7.10"
+-  resolved "https://registry.yarnpkg.com/slate-plain-serializer/-/slate-plain-serializer-0.7.10.tgz#bc4a6942cf52fde826019bb1095dffd0dac8cc08"
+-  integrity sha512-/QvMCQ0F3NzbnuoW+bxsLIChPdRgxBjQeGhYhpRGTVvlZCLOmfDvavhN6fHsuEwkvdwOmocNF30xT1WVlmibYg==
+-
+-slate-prop-types@^0.5.41:
+-  version "0.5.41"
+-  resolved "https://registry.yarnpkg.com/slate-prop-types/-/slate-prop-types-0.5.41.tgz#42031881e2fef4fa978a96b9aad84b093b4a5219"
+-  integrity sha512-fLcXlugO9btF5b/by+dA+n8fn2mET75VGWltqFNxGdl6ncyBtrGspWA7mLVRFSqQWOS/Ig4A3URCRumOBBCUfQ==
+-
+-slate-react-placeholder@^0.2.8:
+-  version "0.2.8"
+-  resolved "https://registry.yarnpkg.com/slate-react-placeholder/-/slate-react-placeholder-0.2.8.tgz#973ac47c9a518a1418e89b6021b0f6120c07ce6f"
+-  integrity sha512-CZZSg5usE2ZY/AYg06NVcL9Wia6hD/Mg0w4D4e9rPh6hkkFJg8LZXYMRz+6Q4v1dqHmzRsZ2Ixa0jRuiKXsMaQ==
+-
+-slate@0.47.8:
+-  version "0.47.8"
+-  resolved "https://registry.yarnpkg.com/slate/-/slate-0.47.8.tgz#1e987b74d8216d44ec56154f0e6d3c722ce21e6e"
+-  integrity sha512-/Jt0eq4P40qZvtzeKIvNb+1N97zVICulGQgQoMDH0TI8h8B+5kqa1YeckRdRnuvfYJm3J/9lWn2V3J1PrF+hag==
++slate-plain-serializer@0.7.11:
++  version "0.7.11"
++  resolved "https://registry.yarnpkg.com/slate-plain-serializer/-/slate-plain-serializer-0.7.11.tgz#74ff6eb949e9fbd92ad98ed833d74d5082f2688b"
++  integrity sha512-vzXQ68GiHHcTUcAB6ggf2qN/sX9BoLs77SMHacp5Gkg+oHAA/NxRzRH4efDAhpiJqfJZDrA3rQySK6+Y7KAuwg==
++
++slate-plain-serializer@^0.7.11:
++  version "0.7.13"
++  resolved "https://registry.yarnpkg.com/slate-plain-serializer/-/slate-plain-serializer-0.7.13.tgz#6de8f5c645dd749f1b2e4426c20de74bfd213adf"
++  integrity sha512-TtrlaslxQBEMV0LYdf3s7VAbTxRPe1xaW10WNNGAzGA855/0RhkaHjKkQiRjHv5rvbRleVf7Nxr9fH+4uErfxQ==
++
++slate-prop-types@^0.5.42:
++  version "0.5.44"
++  resolved "https://registry.yarnpkg.com/slate-prop-types/-/slate-prop-types-0.5.44.tgz#da60b69c3451c3bd6cdd60a45d308eeba7e83c76"
++  integrity sha512-JS0iW7uaciE/W3ADuzeN1HOnSjncQhHPXJ65nZNQzB0DF7mXVmbwQKI6cmCo/xKni7XRJT0JbWSpXFhEdPiBUA==
++
++slate-react-placeholder@^0.2.9:
++  version "0.2.9"
++  resolved "https://registry.yarnpkg.com/slate-react-placeholder/-/slate-react-placeholder-0.2.9.tgz#30f450a05d4871c7d1a27668ebe7907861e7ca74"
++  integrity sha512-YSJ9Gb4tGpbzPje3eNKtu26hWM8ApxTk9RzjK+6zfD5V/RMTkuWONk24y6c9lZk0OAYNZNUmrnb/QZfU3j9nag==
++
++slate-react@0.22.10:
++  version "0.22.10"
++  resolved "https://registry.yarnpkg.com/slate-react/-/slate-react-0.22.10.tgz#01296dadb707869ace6cb21d336c90bedfb567bf"
++  integrity sha512-B2Ms1u/REbdd8yKkOItKgrw/tX8klgz5l5x6PP86+oh/yqmB6EHe0QyrYlQ9fc3WBlJUVTOL+nyAP1KmlKj2/w==
++  dependencies:
++    debug "^3.1.0"
++    get-window "^1.1.1"
++    is-window "^1.0.2"
++    lodash "^4.1.1"
++    memoize-one "^4.0.0"
++    prop-types "^15.5.8"
++    react-immutable-proptypes "^2.1.0"
++    selection-is-backward "^1.0.0"
++    slate-base64-serializer "^0.2.112"
++    slate-dev-environment "^0.2.2"
++    slate-hotkeys "^0.2.9"
++    slate-plain-serializer "^0.7.11"
++    slate-prop-types "^0.5.42"
++    slate-react-placeholder "^0.2.9"
++    tiny-invariant "^1.0.1"
++    tiny-warning "^0.0.3"
++
++slate@0.47.9:
++  version "0.47.9"
++  resolved "https://registry.yarnpkg.com/slate/-/slate-0.47.9.tgz#090597dd790e79718f782994907d34a903739443"
++  integrity sha512-EK4O6b7lGt+g5H9PGw9O5KCM4RrOvOgE9mPi3rzQ0zDRlgAb2ga4TdpS6XNQbrsJWsc8I1fjaSsUeCqCUhhi9A==
+   dependencies:
+     debug "^3.1.0"
+     direction "^0.1.5"
+-- 
+2.36.1
+

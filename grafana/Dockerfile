@@ -1,19 +1,23 @@
-ARG GRAFANA_VERSION=7.5.16
-ARG GOLANG_VERSION=1.19.0-alpine3.16
+ARG GRAFANA_VERSION
+ARG GOLANG_VERSION=1.19-alpine3.16
 
 
-# Fetch the sources
+# Fetch the soucrces
 FROM alpine:3.16 as fetcher
 ARG GRAFANA_VERSION
-
-
 WORKDIR /build
 ADD https://github.com/grafana/grafana/archive/refs/tags/v${GRAFANA_VERSION}.tar.gz /grafana.tar.bz2
 RUN tar -xf /grafana.tar.bz2 -C /build --strip-components 1
 
+COPY  ./0001-v7.5.x-Chore-Update-slate-and-related-packages-54566.patch ./
+RUN apk add --no-cache patch
+RUN patch -p1 < 0001-v7.5.x-Chore-Update-slate-and-related-packages-54566.patch
+
+
 # Build UI components
-FROM node:14.15.5-alpine3.13 as js-builder
+FROM node:14.20-alpine3.16 as js-builder
 WORKDIR /usr/src/app/
+
 COPY --from=fetcher /build/package.json /build/yarn.lock ./
 COPY --from=fetcher /build/packages packages
 
@@ -39,21 +43,17 @@ WORKDIR $GOPATH/src/github.com/grafana/grafana
 
 COPY --from=fetcher /build/go.mod ./
 COPY --from=fetcher /build/go.sum ./
-
 COPY --from=fetcher /build/pkg pkg
 
 RUN go mod verify
 
-# COPY --from=fetcher /build/pkg pkg
 COPY --from=fetcher /build/build.go /build/package.json ./
 
 RUN go run build.go build
 
 
 # Final stage
-FROM alpine:3.13 as grafana
-
-LABEL maintainer="Grafana team <hello@grafana.com>"
+FROM alpine:3.16 as grafana
 
 ARG GF_UID="472"
 ARG GF_GID="0"
@@ -92,7 +92,6 @@ RUN export GF_GID_NAME=$(getent group $GF_GID | cut -d':' -f1) && \
     chown -R "grafana:$GF_GID_NAME" "$GF_PATHS_DATA" "$GF_PATHS_HOME/.aws" "$GF_PATHS_LOGS" "$GF_PATHS_PLUGINS" "$GF_PATHS_PROVISIONING" && \
     chmod -R 777 "$GF_PATHS_DATA" "$GF_PATHS_HOME/.aws" "$GF_PATHS_LOGS" "$GF_PATHS_PLUGINS" "$GF_PATHS_PROVISIONING"
 
-COPY --from=go-builder /go/src/github.com/grafana/grafana/bin/linux-amd64/grafana-server /go/src/github.com/grafana/grafana/bin/linux-amd64/grafana-cli ./bin/
 COPY --from=js-builder /usr/src/app/public ./public
 COPY --from=js-builder /usr/src/app/tools ./tools
 
@@ -103,7 +102,7 @@ COPY --from=fetcher /build/packaging/docker/run.sh /run.sh
 USER grafana
 ENTRYPOINT [ "/run.sh" ]
 
-FROM golang:1.19 as gw-builder
+FROM golang:${GOLANG_VERSION}  as gw-builder
 
 ENV GO111MODULE=on
 

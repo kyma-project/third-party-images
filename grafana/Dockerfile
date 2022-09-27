@@ -3,18 +3,16 @@ ARG GOLANG_VERSION=1.19.0-alpine3.16
 
 
 # Fetch the sources
-FROM alpine:3.16.2 as fetcher
-ENV GRAFANA_VERSION ${GRAFANA_VERSION}
+FROM alpine:3.16 as fetcher
+ARG GRAFANA_VERSION
 
 
 WORKDIR /build
-ADD https://github.com/grafana/grafana/archive/refs/tags/v$GRAFANA_VERSION /grafana.tar.bz2
+ADD https://github.com/grafana/grafana/archive/refs/tags/v${GRAFANA_VERSION}.tar.gz /grafana.tar.bz2
 RUN tar -xf /grafana.tar.bz2 -C /build --strip-components 1
 
 # Build UI components
 FROM node:14.15.5-alpine3.13 as js-builder
-# WORKDIR /grafana
-# COPY --from=fetcher /build /grafana/
 WORKDIR /usr/src/app/
 COPY --from=fetcher /build/package.json /build/yarn.lock ./
 COPY --from=fetcher /build/packages packages

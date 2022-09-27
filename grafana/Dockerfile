@@ -6,7 +6,7 @@ ARG GOLANG_VERSION=1.19.0-alpine3.16
 FROM alpine:3.16.2 as fetcher
 
 WORKDIR /build
-ADD https://github.com/grafana/grafana/archive/refs/tags/v${GRAFANA_VERSION} /grafana.tar.bz2
+ADD https://github.com/grafana/grafana/archive/refs/tags/v$GRAFANA_VERSION /grafana.tar.bz2
 RUN tar -xf /grafana.tar.bz2 -C /build --strip-components 1
 
 # Build UI components

@@ -4,6 +4,8 @@ ARG GOLANG_VERSION=1.19.0-alpine3.16
 
 # Fetch the sources
 FROM alpine:3.16.2 as fetcher
+ENV GRAFANA_VERSION ${GRAFANA_VERSION}
+
 
 WORKDIR /build
 ADD https://github.com/grafana/grafana/archive/refs/tags/v$GRAFANA_VERSION /grafana.tar.bz2

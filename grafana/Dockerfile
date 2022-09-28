@@ -14,7 +14,7 @@ WORKDIR /usr/src/app/
 COPY --from=fetcher /build/package.json /build/yarn.lock ./
 COPY --from=fetcher /build/packages packages
 
-RUN apk add --no-cache git
+# RUN apk add --no-cache git
 
 RUN yarn install --pure-lockfile --no-progress
 

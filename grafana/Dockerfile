@@ -9,20 +9,29 @@ RUN tar -xf /grafana.tar.bz2 -C /build --strip-components 1
 
 # Build UI components
 FROM node:14.15.5-alpine3.13 as js-builder
+WORKDIR /build
+ADD https://github.com/grafana/grafana/archive/refs/tags/v${GRAFANA_VERSION}.tar.gz /grafana.tar.bz2
+RUN tar -xf /grafana.tar.bz2 -C /build --strip-components 1
+
 WORKDIR /usr/src/app/
 
-COPY --from=fetcher /build/package.json /build/yarn.lock ./
-COPY --from=fetcher /build/packages packages
+RUN cp /build/package.json ./
+RUN cp /build/yarn.lock ./
+RUN cp /build/packages packages
 
 # RUN apk add --no-cache git
 
 RUN yarn install --pure-lockfile --no-progress
 
-COPY --from=fetcher /build/tsconfig.json /build/.eslintrc /build/.editorconfig /build/.browserslistrc /build/.prettierrc.js ./
-COPY --from=fetcher  /build/public public
-COPY --from=fetcher  /build/tools tools
-COPY --from=fetcher  /build/scripts scripts
-COPY --from=fetcher  /build/emails emails
+RUN cp /build/tsconfig.json ./
+RUN cp /build/.eslintrc ./
+RUN cp /build/.editorconfig ./
+RUN cp /build/.browserslistrc ./
+RUN cp /build/.prettierrc.js ./
+RUN cp /build/public public
+RUN cp /build/tools tools
+RUN cp /build/scripts scripts
+RUN cp /build/emails emails
 
 ENV NODE_ENV production
 RUN yarn build

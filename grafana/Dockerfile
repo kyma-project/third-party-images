@@ -9,6 +9,7 @@ RUN tar -xf /grafana.tar.bz2 -C /build --strip-components 1
 
 # Build UI components
 FROM node:14.15.5-alpine3.13 as js-builder
+ARG GRAFANA_VERSION
 WORKDIR /build
 ADD https://github.com/grafana/grafana/archive/refs/tags/v${GRAFANA_VERSION}.tar.gz /grafana.tar.bz2
 RUN tar -xf /grafana.tar.bz2 -C /build --strip-components 1
@@ -17,9 +18,12 @@ WORKDIR /usr/src/app/
 
 RUN cp /build/package.json ./
 RUN cp /build/yarn.lock ./
-RUN cp /build/packages packages
+RUN cp -R /build/patches patches
 
-# RUN apk add --no-cache git
+RUN cp -R /build/packages packages
+
+RUN apk --no-cache upgrade && \
+    apk add --no-cache git
 
 RUN yarn install --pure-lockfile --no-progress
 
@@ -28,10 +32,11 @@ RUN cp /build/.eslintrc ./
 RUN cp /build/.editorconfig ./
 RUN cp /build/.browserslistrc ./
 RUN cp /build/.prettierrc.js ./
-RUN cp /build/public public
-RUN cp /build/tools tools
-RUN cp /build/scripts scripts
-RUN cp /build/emails emails
+
+RUN cp -R /build/public public
+RUN cp -R /build/tools tools
+RUN cp -R /build/scripts scripts
+RUN cp -R /build/emails emails
 
 ENV NODE_ENV production
 RUN yarn build
@@ -73,7 +78,7 @@ RUN apk --no-cache upgrade && \
     apk add --no-cache ca-certificates bash tzdata && \
     apk add --no-cache openssl musl-utils
 
-COPY --from=fetcher /build/conf ./conf
+COPY --from=fetcher /build/conf conf
 
 RUN if [ ! $(getent group "$GF_GID") ]; then \
       addgroup -S -g $GF_GID grafana; \
@@ -94,10 +99,10 @@ RUN export GF_GID_NAME=$(getent group $GF_GID | cut -d':' -f1) && \
     chown -R "grafana:$GF_GID_NAME" "$GF_PATHS_DATA" "$GF_PATHS_HOME/.aws" "$GF_PATHS_LOGS" "$GF_PATHS_PLUGINS" "$GF_PATHS_PROVISIONING" && \
     chmod -R 777 "$GF_PATHS_DATA" "$GF_PATHS_HOME/.aws" "$GF_PATHS_LOGS" "$GF_PATHS_PLUGINS" "$GF_PATHS_PROVISIONING"
 
-COPY --from=go-builder /go/src/github.com/grafana/grafana/bin/linux-amd64/grafana-server ./bin/
+COPY --from=go-builder /go/src/github.com/grafana/grafana/bin/linux-amd64/grafana-server bin/
 
-COPY --from=js-builder /usr/src/app/public ./public
-COPY --from=js-builder /usr/src/app/tools ./tools
+COPY --from=js-builder /usr/src/app/public public
+COPY --from=js-builder /usr/src/app/tools tools
 
 EXPOSE 3000
 

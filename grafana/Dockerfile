@@ -7,11 +7,6 @@ WORKDIR /build
 ADD https://github.com/grafana/grafana/archive/refs/tags/v${GRAFANA_VERSION}.tar.gz /grafana.tar.bz2
 RUN tar -xf /grafana.tar.bz2 -C /build --strip-components 1
 
-COPY  ./0001-v7.5.x-Chore-Update-slate-and-related-packages-54566.patch ./
-RUN apk add --no-cache patch
-RUN patch -p1 < 0001-v7.5.x-Chore-Update-slate-and-related-packages-54566.patch
-
-
 # Build UI components
 FROM node:14.20-alpine3.16 as js-builder
 WORKDIR /usr/src/app/

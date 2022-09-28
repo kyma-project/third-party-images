@@ -8,7 +8,7 @@ ADD https://github.com/grafana/grafana/archive/refs/tags/v${GRAFANA_VERSION}.tar
 RUN tar -xf /grafana.tar.bz2 -C /build --strip-components 1
 
 # Build UI components
-FROM node:14.20-alpine3.16 as js-builder
+FROM node:14.15.5-alpine3.13 as js-builder
 WORKDIR /usr/src/app/
 
 COPY --from=fetcher /build/package.json /build/yarn.lock ./

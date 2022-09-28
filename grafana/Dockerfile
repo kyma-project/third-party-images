@@ -1,6 +1,4 @@
 ARG GRAFANA_VERSION
-ARG GOLANG_VERSION=1.19-alpine3.16
-
 
 # Fetch the soucrces
 FROM alpine:3.16 as fetcher
@@ -35,7 +33,7 @@ ENV NODE_ENV production
 RUN yarn build
 
 # Build go components
-FROM golang:${GOLANG_VERSION} as go-builder
+FROM golang:1.19-alpine3.16 as go-builder
 
 RUN apk add --no-cache gcc g++
 
@@ -67,8 +65,8 @@ ENV PATH="/usr/share/grafana/bin:$PATH" \
     GF_PATHS_PROVISIONING="/etc/grafana/provisioning"
 
 WORKDIR $GF_PATHS_HOME
-
-RUN apk add --no-cache ca-certificates bash tzdata && \
+RUN apk --no-cache upgrade && \
+    apk add --no-cache ca-certificates bash tzdata && \
     apk add --no-cache openssl musl-utils
 
 COPY --from=fetcher /build/conf ./conf
@@ -104,7 +102,7 @@ COPY --from=fetcher /build/packaging/docker/run.sh /run.sh
 USER grafana
 ENTRYPOINT [ "/run.sh" ]
 
-FROM golang:${GOLANG_VERSION}  as gw-builder
+FROM golang:1.19-alpine3.16  as gw-builder
 
 RUN apk add --no-cache gcc g++
 

@@ -1,6 +1,6 @@
 ARG GRAFANA_VERSION
 
-# Fetch the soucrces
+# Fetch the sources
 FROM alpine:3.16 as fetcher
 ARG GRAFANA_VERSION
 WORKDIR /build

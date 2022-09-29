@@ -9,34 +9,30 @@ RUN tar -xf /grafana.tar.bz2 -C /build --strip-components 1
 
 # Build UI components
 FROM node:14.20-alpine3.16 as js-builder
-ARG GRAFANA_VERSION
-WORKDIR /build
-ADD https://github.com/grafana/grafana/archive/refs/tags/v${GRAFANA_VERSION}.tar.gz /grafana.tar.bz2
-RUN tar -xf /grafana.tar.bz2 -C /build --strip-components 1
 
 WORKDIR /usr/src/app/
 
-RUN cp /build/package.json ./
-RUN cp /build/yarn.lock ./
-RUN cp -R /build/patches patches
+COPY --from=fetcher /build/package.json ./
+COPY --from=fetcher /build/yarn.lock ./
+COPY --from=fetcher /build/patches patches
 
-RUN cp -R /build/packages packages
+COPY --from=fetcher /build/packages packages
 
 RUN apk --no-cache upgrade && \
     apk add --no-cache git
 
 RUN yarn install --pure-lockfile --no-progress
 
-RUN cp /build/tsconfig.json ./
-RUN cp /build/.eslintrc ./
-RUN cp /build/.editorconfig ./
-RUN cp /build/.browserslistrc ./
-RUN cp /build/.prettierrc.js ./
+COPY --from=fetcher /build/tsconfig.json ./
+COPY --from=fetcher /build/.eslintrc ./
+COPY --from=fetcher /build/.editorconfig ./
+COPY --from=fetcher /build/.browserslistrc ./
+COPY --from=fetcher /build/.prettierrc.js ./
 
-RUN cp -R /build/public public
-RUN cp -R /build/tools tools
-RUN cp -R /build/scripts scripts
-RUN cp -R /build/emails emails
+COPY --from=fetcher /build/public public
+COPY --from=fetcher /build/tools tools
+COPY --from=fetcher /build/scripts scripts
+COPY --from=fetcher /build/emails emails
 
 ENV NODE_ENV production
 RUN yarn build

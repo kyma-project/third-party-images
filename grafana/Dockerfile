@@ -1,5 +1,3 @@
-ARG GRAFANA_VERSION
-
 # Fetch the sources
 FROM alpine:3.16 as fetcher
 ARG GRAFANA_VERSION

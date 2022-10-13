@@ -8,7 +8,7 @@ RUN tar -xz --strip-components=1 --directory=/src/ksm --file=/ksm.tar.gz
 
 RUN make build-local
 
-FROM gcr.io/distroless/static:latest-amd64
+FROM scratch
 COPY --from=builder /src/ksm/kube-state-metrics /
 
 USER nobody

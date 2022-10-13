@@ -10,10 +10,10 @@
 
 /.github/ISSUE_TEMPLATE @NHingerl @grego952 @majakurcius @mmitoraj
 /.github @kyma-project/prow
-/cloudsql-proxy @ralikio @szwedm @tillknuesting @wozniakjan @hanngos @piotrmiskiewicz @pk85
+/cloudsql-proxy @ralikio @szwedm @tillknuesting @wozniakjan @piotrmiskiewicz @pk85
 /common @kyma-project/prow
 /docker-registry @cortey @dbadura @m00g3n @moelsayed @pprecel
-/etcd @pk85 @ralikio @szwedm @tillknuesting @wozniakjan @hanngos @piotrmiskiewicz
+/etcd @pk85 @ralikio @szwedm @tillknuesting @wozniakjan @piotrmiskiewicz
 /fluent-bit @dennis-ge @lindnerby @rakesh-garimella @skhalash @a-thaler @chrkl
 /grafana @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash @hisarbalik
 /jaeger-operator @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash @hisarbalik

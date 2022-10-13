@@ -15,16 +15,17 @@
 /docker-registry @cortey @dbadura @m00g3n @moelsayed @pprecel
 /etcd @pk85 @ralikio @szwedm @tillknuesting @wozniakjan @hanngos @piotrmiskiewicz
 /fluent-bit @dennis-ge @lindnerby @rakesh-garimella @skhalash @a-thaler @chrkl
-/grafana @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash
-/jaeger-operator @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash
+/grafana @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash @hisarbalik
+/jaeger-operator @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash @hisarbalik
 /k8s-tools @kyma-project/prow
 /kaniko-executer @pprecel @cortey @dbadura @m00g3n @moelsayed
-/kiali @skhalash @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella
-/kiwigrid-sidecar @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash @a-thaler
-/loki @skhalash @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella
+/kiali @skhalash @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @hisarbalik
+/kiwigrid-sidecar @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash @a-thaler @hisarbalik
+/loki @skhalash @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @hisarbalik
 /minio @cortey @dbadura @m00g3n @moelsayed @pprecel
-/oauth2-proxy @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash
-/prometheus-node-exporter @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash
+/oauth2-proxy @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash @hisarbalik
+/prometheus-node-exporter @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash @hisarbalik
+/kube-state-metrics @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash @hisarbalik
 
 # All .md files
 *.md @majakurcius @klaudiagrz @NHingerl @mmitoraj @grego952

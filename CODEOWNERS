@@ -8,7 +8,7 @@
 # These are the default owners for the whole content of the `fluentbit` repository. The default owners are automatically added as reviewers when you open a pull request, unless different owners are specified in the file.
 * @a-thaler @PK85 @pbochynski @kwiatekus
 
-/.github/ISSUE_TEMPLATE @NHingerl @grego952 @klaudiagrz @majakurcius @mmitoraj
+/.github/ISSUE_TEMPLATE @NHingerl @grego952 @majakurcius @mmitoraj
 /.github @kyma-project/prow
 /cloudsql-proxy @ralikio @szwedm @tillknuesting @wozniakjan @hanngos @piotrmiskiewicz @pk85
 /common @kyma-project/prow
@@ -28,4 +28,4 @@
 /kube-state-metrics @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash @hisarbalik
 
 # All .md files
-*.md @majakurcius @klaudiagrz @NHingerl @mmitoraj @grego952
+*.md @majakurcius @NHingerl @mmitoraj @grego952

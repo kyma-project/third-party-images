@@ -2,4 +2,4 @@
 
 The official KSM Docker image is [here](https://github.com/kubernetes/kube-state-metrics/blob/master/Dockerfile).
 
-This custom image has been created to mitigate the security vulnerabilities the official image has.
+This custom image mitigates the security vulnerabilities that the official image has.

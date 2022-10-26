@@ -25,8 +25,8 @@ RUN set -ex \
     && apk upgrade --no-cache \
     && apk add --no-cache ca-certificates apache2-utils
 
-COPY --from=build /go/src/github.com/docker/distribution/cmd/registry/config-dev.yml /etc/docker/registry/config.yml
-COPY --from=build /go/src/github.com/docker/distribution/bin/registry /bin/registry
+COPY --from=builder /go/src/github.com/docker/distribution/cmd/registry/config-dev.yml /etc/docker/registry/config.yml
+COPY --from=builder /go/src/github.com/docker/distribution/bin/registry /bin/registry
 
 VOLUME ["/var/lib/registry"]
 EXPOSE 5000

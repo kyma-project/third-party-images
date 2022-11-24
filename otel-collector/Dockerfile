@@ -7,8 +7,6 @@ COPY main.go main.go
 COPY go.mod go.mod
 COPY go.sum go.sum
 
-COPY config.yaml config.yaml
-
 RUN go mod download
 
 RUN go build -ldflags '-s -w' -o otelcol main.go

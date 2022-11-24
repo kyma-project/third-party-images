@@ -1,0 +1,24 @@
+dist:
+  module: go.opentelemetry.io/collector/cmd/otelcorecol
+  name: otelcorecol
+  description: OpenTelemetry Collector binary for Kyma.
+  version: 0.66.0
+  otelcol_version: 0.66.0
+
+receivers:
+  - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v0.66.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/opencensusreceiver v0.66.0
+
+processors:
+  - gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.66.0
+  - gomod: go.opentelemetry.io/collector/processor/memorylimiterprocessor v0.66.0
+
+exporters:
+  - gomod: go.opentelemetry.io/collector/exporter/loggingexporter v0.66.0
+  - gomod: go.opentelemetry.io/collector/exporter/otlpexporter v0.66.0
+  - gomod: go.opentelemetry.io/collector/exporter/otlphttpexporter v0.66.0
+
+replaces:
+  - cloud.google.com/go/compute => cloud.google.com/go/compute v1.12.1
+  - cloud.google.com/go/compute/metadata => cloud.google.com/go/compute/metadata v0.2.1
+  

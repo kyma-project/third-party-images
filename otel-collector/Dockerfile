@@ -1,10 +1,12 @@
-ARG GOLANG_VERSION=1.19
+ARG GOLANG_VERSION
 
 FROM golang:${GOLANG_VERSION} as build
 ARG  OTEL_VERSION
 
 WORKDIR /app
 COPY builder-config.yaml .
+ENV OTEL_VERSION ${OTEL_VERSION}
+RUN sed -i s/OTEL_VERSION/${OTEL_VERSION}/g builder-config.yaml
 
 RUN go install go.opentelemetry.io/collector/cmd/builder@v${OTEL_VERSION}
 RUN builder --config=builder-config.yaml --name=otelcol --output-path=.

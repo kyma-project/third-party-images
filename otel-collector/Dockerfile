@@ -1,7 +1,7 @@
 ARG GOLANG_VERSION=1.19
 
 FROM golang:${GOLANG_VERSION} as build
-ARG  OTEL_VERSION=0.66.0
+ARG  OTEL_VERSION
 
 WORKDIR /app
 COPY builder-config.yaml .

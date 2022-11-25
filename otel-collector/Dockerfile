@@ -16,4 +16,6 @@ FROM gcr.io/distroless/base-debian11
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=build /app/otelcol /
 
+USER 65532:65532
+
 ENTRYPOINT ["/otelcol"]

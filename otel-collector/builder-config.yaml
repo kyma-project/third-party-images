@@ -18,7 +18,9 @@ exporters:
   - gomod: go.opentelemetry.io/collector/exporter/otlpexporter vOTEL_VERSION
   - gomod: go.opentelemetry.io/collector/exporter/otlphttpexporter vOTEL_VERSION
 
+extensions:
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension vOTEL_VERSION
+
 replaces:
   - cloud.google.com/go/compute => cloud.google.com/go/compute v1.12.1
   - cloud.google.com/go/compute/metadata => cloud.google.com/go/compute/metadata v0.2.1
-  

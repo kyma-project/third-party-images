@@ -8,7 +8,7 @@ LABEL io.kyma-project.third-party-images.commit=$commit
 
 LABEL source=git@github.com:kyma-project/third-party-images.git
 
-ENV KUBECTL_VERSION="v1.24.7"
+ENV KUBECTL_VERSION="v1.24.9"
 
 RUN apk --no-cache upgrade &&\
 apk add --no-cache curl=7.86.0-r1  --repository=http://dl-cdn.alpinelinux.org/alpine/edge/main &&\

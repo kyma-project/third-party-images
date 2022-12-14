@@ -12,6 +12,7 @@ receivers:
 processors:
   - gomod: go.opentelemetry.io/collector/processor/batchprocessor vOTEL_VERSION
   - gomod: go.opentelemetry.io/collector/processor/memorylimiterprocessor vOTEL_VERSION
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/k8sattributesprocessor vOTEL_VERSION
 
 exporters:
   - gomod: go.opentelemetry.io/collector/exporter/loggingexporter vOTEL_VERSION

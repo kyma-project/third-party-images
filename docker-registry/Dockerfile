@@ -14,7 +14,7 @@ RUN set -ex \
     && apk add --no-cache make git file
 
 WORKDIR $DISTRIBUTION_DIR
-RUN git clone -b release/2.8.1 https://github.com/distribution/distribution $DISTRIBUTION_DIR
+RUN git clone -b v2.8.1 https://github.com/distribution/distribution $DISTRIBUTION_DIR
 
 RUN CGO_ENABLED=0 make PREFIX=/go clean binaries && file ./bin/registry | grep "statically linked"
 

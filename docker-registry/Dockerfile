@@ -35,4 +35,3 @@ LABEL source=git@github.com:kyma-project/kyma.git
 
 ENTRYPOINT ["registry"]
 CMD ["serve", "/etc/docker/registry/config.yml"]
-

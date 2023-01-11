@@ -1,4 +1,4 @@
-  
+
 # This file provides an overview of code owners in the `fluentbit` repository.
 
 # Each line is a file pattern followed by one or more owners.
@@ -18,7 +18,6 @@
 /jaeger-operator @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash @hisarbalik
 /k8s-tools @kyma-project/prow
 /kaniko-executer @pprecel @cortey @dbadura @m00g3n @moelsayed
-/kiali @skhalash @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @hisarbalik
 /kiwigrid-sidecar @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash @a-thaler @hisarbalik
 /loki @skhalash @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @hisarbalik
 /oauth2-proxy @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash @hisarbalik

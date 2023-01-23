@@ -1,5 +1,5 @@
 ARG FLB_VERSION
-ARG GOLANG_VERSION=1.19.2
+ARG GOLANG_VERSION=1.19.5
 
 FROM fluent/fluent-bit:${FLB_VERSION} as fluentbit
 

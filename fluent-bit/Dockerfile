@@ -32,7 +32,7 @@ RUN apt-get update && \
     bison \
     libyaml-dev \
     libjemalloc-dev \
-    libc-ares-dev \ 
+    libc-ares-dev \
     && curl -L -o "/tmp/fluent-bit.tar.gz" ${FLB_SOURCE} \
     && cd tmp/ && mkdir fluent-bit \
     && tar zxfv fluent-bit.tar.gz -C ./fluent-bit --strip-components=1 \
@@ -78,7 +78,7 @@ RUN go get github.com/json-iterator/go@v1.1.12
 RUN go mod vendor
 
 # build the plugin
-RUN make clean && make BUILD_IN_CONTAINER=false fluent-bit-plugin 
+RUN make clean && make BUILD_IN_CONTAINER=false fluent-bit-plugin
 RUN cp /tmp/src/cmd/fluent-bit/out_grafana_loki.so /loki
 
 # Take upstream image and copy over our plugins

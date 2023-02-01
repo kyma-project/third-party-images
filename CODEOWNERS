@@ -1,11 +1,11 @@
 
-# This file provides an overview of code owners in the `fluentbit` repository.
+# This file provides an overview of code owners in this repository.
 
 # Each line is a file pattern followed by one or more owners.
 # The last matching pattern has the most precedence.
 # For more details, read the following article on GitHub: https://help.github.com/articles/about-codeowners/.
 
-# These are the default owners for the whole content of the `fluentbit` repository. The default owners are automatically added as reviewers when you open a pull request, unless different owners are specified in the file.
+# These are the default owners for the whole content of the this repository. The default owners are automatically added as reviewers when you open a pull request, unless different owners are specified in the file.
 * @a-thaler @PK85 @pbochynski @kwiatekus
 
 /.github/ISSUE_TEMPLATE @NHingerl @grego952 @mmitoraj @IwonaLanger @nataliasitko
@@ -13,17 +13,17 @@
 /cloudsql-proxy @strekm @werdes72 @dariusztutaj @cnvergence @barchw @videlov @triffer
 /common @kyma-project/prow
 /docker-registry @cortey @dbadura @m00g3n @moelsayed @pprecel
-/fluent-bit @dennis-ge @lindnerby @rakesh-garimella @skhalash @a-thaler @chrkl
-/grafana @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash @hisarbalik
-/jaeger-operator @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash @hisarbalik
+/fluent-bit @kyma-project/observability
+/grafana @kyma-project/observability
+/jaeger-operator @kyma-project/observability
 /k8s-tools @kyma-project/prow
 /kaniko-executer @pprecel @cortey @dbadura @m00g3n @moelsayed
-/kiwigrid-sidecar @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash @a-thaler @hisarbalik
-/loki @skhalash @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @hisarbalik
-/oauth2-proxy @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash @hisarbalik
-/prometheus-node-exporter @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash @hisarbalik
-/kube-state-metrics @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash @hisarbalik
-/otel-collector @a-thaler @chrkl @dennis-ge @lindnerby @rakesh-garimella @skhalash @hisarbalik
+/kiwigrid-sidecar @kyma-project/observability
+/loki @skhalash @kyma-project/observability
+/oauth2-proxy @kyma-project/observability
+/prometheus-node-exporter @kyma-project/observability
+/kube-state-metrics @kyma-project/observability
+/otel-collector @kyma-project/observability
 
 # All .md files
 *.md @NHingerl @mmitoraj @grego952 @IwonaLanger @nataliasitko

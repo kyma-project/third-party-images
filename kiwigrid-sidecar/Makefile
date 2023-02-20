@@ -11,3 +11,5 @@ include $(COMMON_DIR)/generic_makefile.mk
 # override docker-build
 docker-build:
 	docker build . -t ${IMG} --build-arg KIWIGRID_SIDECAR_VERSION=$(KIWIGRID_SIDECAR_VERSION)
+
+# added a line to trigger a build with latest alpine version

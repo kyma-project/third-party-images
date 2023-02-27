@@ -4,7 +4,7 @@ dist:
   description: OpenTelemetry Collector binary for Kyma.
   version: OTEL_VERSION
   otelcol_version: OTEL_VERSION
-  output-path: .
+  output_path: .
 
 receivers:
   - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver vOTEL_VERSION

@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# image builder base on golang:1.19.4-alpine3.17-v1
-FROM eu.gcr.io/kyma-project/external/golang@sha256:a9b24b67dc83b3383d22a14941c2b2b2ca6a103d805cac6820fd1355943beaf1 as builder
+# image builder base on golang:1.20.2-alpine3.17
+FROM eu.gcr.io/kyma-project/external/golang@sha256:4e6bc0eafc261b6c8ba9bd9999b6698e8cefbe21e6d90fbc10c34599d75dc608 as builder
 
 ARG KANIKO_VERSION
 ARG GOARCH=amd64
@@ -34,7 +34,7 @@ RUN GOARCH=$(cat /goarch) && CGO_ENABLED=0 && \
   cd /go/src/github.com/GoogleCloudPlatform                                  && \
   git clone https://github.com/GoogleCloudPlatform/docker-credential-gcr.git && \
   cd /go/src/github.com/GoogleCloudPlatform/docker-credential-gcr            && \
-  go build -ldflags "-linkmode external -extldflags -static" -i -o /usr/local/bin/docker-credential-gcr main.go
+  go build -ldflags "-linkmode external -extldflags -static" -o /usr/local/bin/docker-credential-gcr main.go
 
 # Get Amazon ECR credential helper
 RUN GOARCH=$(cat /goarch) && GO111MODULE=off go get -u github.com/awslabs/amazon-ecr-credential-helper/ecr-login/cli/docker-credential-ecr-login && \

@@ -9,6 +9,7 @@ dist:
 receivers:
   - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver vOTEL_VERSION
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/opencensusreceiver vOTEL_VERSION
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver vOTEL_VERSION
 
 processors:
   - gomod: go.opentelemetry.io/collector/processor/batchprocessor vOTEL_VERSION
@@ -21,7 +22,7 @@ exporters:
   - gomod: go.opentelemetry.io/collector/exporter/loggingexporter vOTEL_VERSION
   - gomod: go.opentelemetry.io/collector/exporter/otlpexporter vOTEL_VERSION
   - gomod: go.opentelemetry.io/collector/exporter/otlphttpexporter vOTEL_VERSION
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/fileexporter vOTEL_VERSION
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter vOTEL_VERSION
 
 extensions:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension vOTEL_VERSION

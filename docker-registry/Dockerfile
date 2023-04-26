@@ -1,5 +1,5 @@
-# image builder base on golang:1.20.2-alpine3.17
-FROM eu.gcr.io/kyma-project/external/golang@sha256:4e6bc0eafc261b6c8ba9bd9999b6698e8cefbe21e6d90fbc10c34599d75dc608 as builder
+# image builder base on golang:1.20.3-alpine3.17
+FROM eu.gcr.io/kyma-project/external/golang@sha256:08e9c086194875334d606765bd60aa064abd3c215abfbcf5737619110d48d114 as builder
 
 ENV GO111MODULE=auto
 ENV DISTRIBUTION_DIR /go/src/github.com/docker/distribution

@@ -15,7 +15,6 @@
 /docker-registry @cortey @dbadura @m00g3n @moelsayed @pprecel
 /fluent-bit @kyma-project/observability
 /grafana @kyma-project/observability
-/jaeger-operator @kyma-project/observability
 /k8s-tools @kyma-project/prow
 /kaniko-executer @pprecel @cortey @dbadura @m00g3n @moelsayed
 /kiwigrid-sidecar @kyma-project/observability

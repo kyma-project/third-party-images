@@ -11,13 +11,13 @@
 /.github/ISSUE_TEMPLATE @NHingerl @grego952 @mmitoraj @IwonaLanger @nataliasitko
 /.github @kyma-project/prow
 /alertmanager @kyma-project/observability
-/cloudsql-proxy @strekm @werdes72 @dariusztutaj @cnvergence @barchw @videlov @triffer
+/cloudsql-proxy @strekm @werdes72 @barchw @videlov @triffer
 /common @kyma-project/prow
-/docker-registry @cortey @dbadura @m00g3n @moelsayed @pprecel
+/docker-registry @cortey @dbadura @m00g3n @pprecel
 /fluent-bit @kyma-project/observability
 /grafana @kyma-project/observability
 /k8s-tools @kyma-project/prow
-/kaniko-executer @pprecel @cortey @dbadura @m00g3n @moelsayed
+/kaniko-executer @pprecel @cortey @dbadura @m00g3n
 /kiwigrid-sidecar @kyma-project/observability
 /loki @skhalash @kyma-project/observability
 /oauth2-proxy @kyma-project/observability

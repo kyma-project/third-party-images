@@ -10,6 +10,7 @@
 
 /.github/ISSUE_TEMPLATE @NHingerl @grego952 @mmitoraj @IwonaLanger @nataliasitko
 /.github @kyma-project/prow
+/alertmanager @kyma-project/observability
 /cloudsql-proxy @strekm @werdes72 @dariusztutaj @cnvergence @barchw @videlov @triffer
 /common @kyma-project/prow
 /docker-registry @cortey @dbadura @m00g3n @moelsayed @pprecel

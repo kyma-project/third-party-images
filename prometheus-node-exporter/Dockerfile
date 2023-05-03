@@ -1,26 +1,20 @@
-ARG ALPINE_VERSION
-
-FROM alpine:${ALPINE_VERSION} as builder
-
+ARG GOLANG_VERSION
+ARG BUSYBOX_VERSION
 ARG NODE_EXPORTER_VERSION
+FROM golang:${GOLANG_VERSION} as builder
 
-RUN apk update && apk upgrade && \
-    apk add --no-cache bash curl
-
-RUN curl -LO https://github.com/prometheus/node_exporter/releases/download/v${NODE_EXPORTER_VERSION}/node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz \
+RUN curl -LO https://github.com/prometheus/node_exporter/archive/refs/tags/v${NODE_EXPORTER_VERSION}.tar.gz \
     && tar -xvzf node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz  \
-    && cp node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64/node_exporter /tmp/
+    && cp node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64 /tmp/ \
+WORKDIR /tmp
+RUN make build
 
-FROM scratch
-
-COPY --from=builder /tmp/node_exporter /usr/local/bin/
-COPY --from=builder /etc/passwd /etc/passwd
-
-EXPOSE 9100
-
-USER nobody
-
+FROM europe-docker.pkg.dev/kyma-project/prod/external/busybox:${BUSYBOX_VERSION}
 LABEL source=git@github.com:kyma-project/kyma.git
 
-ENTRYPOINT ["node_exporter"]
+COPY --from=builder /tmp/node_exporter /bin/node_exporter
+
+EXPOSE      9100
+USER        nobody
+ENTRYPOINT  [ "/bin/node_exporter" ]
 

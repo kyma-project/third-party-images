@@ -10,4 +10,4 @@ include $(COMMON_DIR)/generic_makefile.mk
 
 # override docker-build
 docker-build:
-	docker build . -t ${IMG} --build-arg NODE_EXPORTER_VERSION=$(NODE_EXPORTER_VERSION)
+	docker build . -t ${IMG} --build-arg GOLANG_VERSION=$(GOLANG_VERSION) --build-arg BUSYBOX_VERSION=$(BUSYBOX_VERSION) --build-arg NODE_EXPORTER_VERSION=$(NODE_EXPORTER_VERSION)

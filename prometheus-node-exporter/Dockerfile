@@ -3,16 +3,15 @@ FROM golang:${GOLANG_VERSION} as builder
 
 ARG NODE_EXPORTER_VERSION
 RUN curl -LO https://github.com/prometheus/node_exporter/archive/refs/tags/v${NODE_EXPORTER_VERSION}.tar.gz \
-    && tar -xvzf node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz  \
-    && cp -R node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64/* /tmp/
-WORKDIR /tmp
+    && tar -xvzf node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz
+WORKDIR /node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64
 RUN make build
 
 ARG BUSYBOX_VERSION
 FROM europe-docker.pkg.dev/kyma-project/prod/external/busybox:${BUSYBOX_VERSION}
 LABEL source=git@github.com:kyma-project/kyma.git
 
-COPY --from=builder /tmp/node_exporter /bin/node_exporter
+COPY --from=builder /node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64 /bin/node_exporter
 
 EXPOSE      9100
 USER        nobody

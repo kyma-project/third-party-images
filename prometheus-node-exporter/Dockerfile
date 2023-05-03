@@ -2,7 +2,6 @@ ARG GOLANG_VERSION
 FROM golang:${GOLANG_VERSION} as builder
 
 ARG NODE_EXPORTER_VERSION
-ENV NODE_EXPORTER_VERSION ${NODE_EXPORTER_VERSION}
 RUN curl -LO https://github.com/prometheus/node_exporter/archive/refs/tags/v${NODE_EXPORTER_VERSION}.tar.gz \
     && tar -xvzf node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64.tar.gz  \
     && cp node_exporter-${NODE_EXPORTER_VERSION}.linux-amd64 /tmp/ \

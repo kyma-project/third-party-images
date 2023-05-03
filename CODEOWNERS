@@ -12,6 +12,7 @@
 /.github @kyma-project/prow
 /cloudsql-proxy @strekm @werdes72 @dariusztutaj @cnvergence @barchw @videlov @triffer
 /common @kyma-project/prow
+/configmap-reload @kyma-project/observability
 /docker-registry @cortey @dbadura @m00g3n @moelsayed @pprecel
 /fluent-bit @kyma-project/observability
 /grafana @kyma-project/observability

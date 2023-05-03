@@ -3,9 +3,9 @@ FROM golang:${GOLANG_VERSION} as builder
 
 ARG NODE_EXPORTER_VERSION
 WORKDIR /
-RUN curl -Lo /node_exporter https://github.com/prometheus/node_exporter/archive/refs/tags/v${NODE_EXPORTER_VERSION}.tar.gz && \
+RUN curl -Lo /node_exporter.tar.gz https://github.com/prometheus/node_exporter/archive/refs/tags/v${NODE_EXPORTER_VERSION}.tar.gz && \
     ls -la / && \
-    tar -xvzf node_exporter.tar.gz
+    tar -xvzf /node_exporter.tar.gz
 WORKDIR /node_exporter
 RUN make build
 

@@ -11,7 +11,7 @@ RUN make build
 
 ARG BUSYBOX_VERSION
 
-FROM europe-docker.pkg.dev/kyma-project/prod/external/busybox:${BUSYBOX_VERSION}
+FROM scratch
 LABEL source=git@github.com:kyma-project/kyma.git
 
 ARG NODE_EXPORTER_VERSION

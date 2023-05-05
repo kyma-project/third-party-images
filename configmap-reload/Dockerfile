@@ -19,3 +19,4 @@ USER 65534
 COPY --from=builder /configmap-reload-${CONFIGMAP_RELOAD_VERSION}/configmap-reload /
 
 ENTRYPOINT ["/configmap-reload"]
+

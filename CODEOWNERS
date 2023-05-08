@@ -6,25 +6,31 @@
 # For more details, read the following article on GitHub: https://help.github.com/articles/about-codeowners/.
 
 # These are the default owners for the whole content of the this repository. The default owners are automatically added as reviewers when you open a pull request, unless different owners are specified in the file.
-* @a-thaler @PK85 @pbochynski @kwiatekus
+* @kyma-project/kyma-steering-committee
 
-/.github/ISSUE_TEMPLATE @NHingerl @grego952 @mmitoraj @IwonaLanger @nataliasitko
+/.github/ISSUE_TEMPLATE @kyma-project/technical-writers
 /.github @kyma-project/prow
-/alertmanager @kyma-project/observability
-/cloudsql-proxy @strekm @werdes72 @barchw @videlov @triffer
+
+/cloudsql-proxy @kyma-project/goat
+
+# Serverless tooling
+/docker-registry @kyma-project/Otters
+/kaniko-executer @kyma-project/Otters
+
+# Common tooling
+/k8s-tools @kyma-project/prow
 /common @kyma-project/prow
+# Telemetry/Observability tooling
+/alertmanager @kyma-project/observability
 /configmap-reload @kyma-project/observability
-/docker-registry @cortey @dbadura @m00g3n @pprecel
 /fluent-bit @kyma-project/observability
 /grafana @kyma-project/observability
-/k8s-tools @kyma-project/prow
-/kaniko-executer @pprecel @cortey @dbadura @m00g3n
 /kiwigrid-sidecar @kyma-project/observability
-/loki @skhalash @kyma-project/observability
+/loki @kyma-project/observability
 /oauth2-proxy @kyma-project/observability
 /prometheus-node-exporter @kyma-project/observability
 /kube-state-metrics @kyma-project/observability
 /otel-collector @kyma-project/observability
 
 # All .md files
-*.md @NHingerl @mmitoraj @grego952 @IwonaLanger @nataliasitko
+*.md @kyma-project/technical-writers

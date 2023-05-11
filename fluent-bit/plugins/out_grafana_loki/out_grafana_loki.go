@@ -130,20 +130,19 @@ func FLBPluginFlushCtx(ctx, data unsafe.Pointer, length C.int, _ *C.char) int {
 		// CUSTOM START: added further case as with 2.1.2 the FLBTime is wrapped in an array
 		case []interface{}:
 			if len(t) < 1 {
-				level.Warn(plugin.logger).Log("msg", "timestamp is an empty array. Use current time. ")
+				level.Warn(plugin.logger).Log("msg", "timestamp is an empty array. Use current time.")
 				timestamp = time.Now()
 			} else {
 				if result, ok := t[0].(output.FLBTime); ok {
-					level.Warn(plugin.logger).Log("msg", "jihaa")
 					timestamp = result.Time
 				} else {
-					level.Warn(plugin.logger).Log("msg", "timestamp is array having wrong type. Use current time. ")
+					level.Warn(plugin.logger).Log("msg", "timestamp is array having wrong type. Use current time.")
 					timestamp = time.Now()
 				}
 			}
 		// CUSTOM END
 		default:
-			level.Warn(plugin.logger).Log("msg", "timestamp isn't known format. Use current time. ")
+			level.Warn(plugin.logger).Log("msg", "timestamp isn't known format. Use current time.")
 			timestamp = time.Now()
 		}
 

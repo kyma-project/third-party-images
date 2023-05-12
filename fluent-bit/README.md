@@ -4,12 +4,25 @@ This image is based on the official [Fluent Bit Docker image](https://github.com
 
 The custom plugin has the following customizations:
 
-* Loki output plugin
-* Sequential HTTP output plugin
+* additional Loki output plugin based on the legacy Grafana Loki sources
+* Sequential HTTP output plugin based on the upstream http output plugin
+
+## Build local
+
+To build the image local, execute the following command, entering the proper versions taken from the `envs` file:
+```
+docker build -t fluent-bit:local --build-arg FLB_VERSION=XXX --build-arg GOLANG_VERSION=XXX
+```
+
+## Loki output plugin
+
+The Kyma logging component ships Loki in the outdated 2.2.1 version still being under Apache 2.0 license. As the current fluent-bit Loki plugin is not compatible anymore with that version of Loki, the legacy fluent-bit plugin provided by Loki is adopted.
+
+The sources are mainly copied over to the `plugins/out_grafana_loki` folder and small adjustements happened to the `out_grafana_loki.go` file indicated with `//CUSTOM`.
 
 ## Sequential HTTP output plugin
 
-The standard HTTP output plugin `out-http` sends out records in batch. This is a problem for some consuming services in the SKR environment (e.g. SAP Audit Service).
+The standard HTTP output plugin `out-http` sends out records in batch. This is a problem for some consuming services in the SAP environment (e.g. SAP Audit Service).
 The `out-sequentialhttp` is a drop-in replacement that sends out records sequentially (one-by-one).
 
 ### Code modifications

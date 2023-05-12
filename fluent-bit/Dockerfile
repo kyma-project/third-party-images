@@ -72,7 +72,7 @@ RUN mkdir -p /plugins/build/
 WORKDIR /plugins/out_grafana_loki
 RUN go mod tidy
 RUN go test
-RUN go build -buildmode=c-shared -o ../build/out_grafana_loki.so ./
+RUN go build -ldflags "-s -w" -buildmode=c-shared -o ../build/out_grafana_loki.so ./
 
 # Take upstream image and copy over our plugins
 FROM fluentbit

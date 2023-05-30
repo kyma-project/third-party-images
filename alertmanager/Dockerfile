@@ -1,5 +1,5 @@
 ARG GOLANG_VERSION
-ARG BUSYBOX_VERSION
+ARG ALPINE_VERSION
 FROM golang:${GOLANG_VERSION} as builder
 
 ARG ALERTMANAGER_VERSION
@@ -9,10 +9,14 @@ RUN curl -LO https://github.com/prometheus/alertmanager/archive/refs/tags/v${ALE
 WORKDIR /alertmanager-${ALERTMANAGER_VERSION}
 RUN make build
 
-FROM europe-docker.pkg.dev/kyma-project/prod/external/busybox:${BUSYBOX_VERSION}
+FROM alpine:${ALPINE_VERSION}
 LABEL source=git@github.com:kyma-project/kyma.git
 
 ARG ALERTMANAGER_VERSION
+
+RUN apk --no-cache upgrade \
+    && apk --no-cache add ca-certificates \
+    && rm -rf /var/cache/apk/*
 
 COPY --from=builder /alertmanager-${ALERTMANAGER_VERSION}/amtool /bin/amtool
 COPY --from=builder /alertmanager-${ALERTMANAGER_VERSION}/alertmanager /bin/alertmanager

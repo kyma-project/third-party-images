@@ -9,8 +9,6 @@ RUN curl -Lo /node_exporter.tar.gz https://github.com/prometheus/node_exporter/a
 WORKDIR /node_exporter-${NODE_EXPORTER_VERSION}
 RUN make build
 
-ARG BUSYBOX_VERSION
-
 FROM scratch
 LABEL source=git@github.com:kyma-project/kyma.git
 

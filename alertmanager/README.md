@@ -8,5 +8,5 @@ This custom image has been created to mitigate the security vulnerabilities the 
 
 To build the image locally, execute the following command, entering the proper versions taken from the `envs` file:
 ```
-docker build -t configmap-reload:local --build-arg ALERTMANAGER_VERSION=XXX --build-arg GOLANG_VERSION=XXX --build-arg ALPINE_VERSION=XXX
+docker build -t alertmanager:local --build-arg ALERTMANAGER_VERSION=XXX --build-arg GOLANG_VERSION=XXX --build-arg ALPINE_VERSION=XXX
 ```

@@ -26,6 +26,7 @@ exporters:
 
 extensions:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension vOTEL_VERSION
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension vOTEL_VERSION
 
 replaces:
   - cloud.google.com/go/compute => cloud.google.com/go/compute v1.12.1

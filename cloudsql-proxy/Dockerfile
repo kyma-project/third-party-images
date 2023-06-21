@@ -1,1 +1,1 @@
-FROM gcr.io/cloudsql-docker/gce-proxy:1.33.6
+FROM gcr.io/cloudsql-docker/gce-proxy:1.33.8

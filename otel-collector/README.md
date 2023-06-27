@@ -8,5 +8,5 @@ This custom image has a minimal set of required receivers, processors and export
 
 To build the image locally, execute the following command, entering the proper versions taken from the `envs` file:
 ```
-docker build -t otel-collector:local --build-arg OTEL_VERSION=XXX --build-arg GOLANG_VERSION=XXX
+docker build -t otel-collector:local --build-arg OTEL_VERSION=XXX --build-arg GOLANG_VERSION=XXX .
 ```

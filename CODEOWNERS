@@ -26,7 +26,6 @@
 /fluent-bit @kyma-project/observability
 /grafana @kyma-project/observability
 /kiwigrid-sidecar @kyma-project/observability
-/loki @kyma-project/observability
 /oauth2-proxy @kyma-project/observability
 /prometheus-node-exporter @kyma-project/observability
 /kube-state-metrics @kyma-project/observability

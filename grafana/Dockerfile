@@ -10,7 +10,7 @@ ADD https://github.com/grafana/grafana/archive/refs/tags/v${GRAFANA_VERSION}.tar
 RUN tar -xf /grafana.tar.bz2 -C /build --strip-components 1
 
 # Build UI components
-FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} as js-builder
+FROM node:${NODE_VERSION} as js-builder
 
 WORKDIR /usr/src/app/
 

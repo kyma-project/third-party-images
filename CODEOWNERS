@@ -22,7 +22,6 @@
 /common @kyma-project/prow
 # Telemetry/Observability tooling
 /alertmanager @kyma-project/observability
-/configmap-reload @kyma-project/observability
 /fluent-bit @kyma-project/observability
 /grafana @kyma-project/observability
 /kiwigrid-sidecar @kyma-project/observability

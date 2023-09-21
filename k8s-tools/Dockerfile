@@ -8,7 +8,7 @@ LABEL io.kyma-project.third-party-images.commit=$commit
 
 LABEL source=git@github.com:kyma-project/third-party-images.git
 
-ENV KUBECTL_VERSION="v1.26.8"
+ENV KUBECTL_VERSION="v1.26.9"
 
 RUN apk --no-cache upgrade &&\
     apk --no-cache add curl wget openssl coreutils curl bash jq grep inotify-tools &&\

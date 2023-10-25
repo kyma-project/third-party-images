@@ -1,5 +1,4 @@
 ARG FLB_VERSION
-ARG GOLANG_VERSION
 
 FROM fluent/fluent-bit:${FLB_VERSION} as fluentbit
 

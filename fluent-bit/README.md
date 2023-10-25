@@ -6,7 +6,7 @@ This image is based on the official [Fluent Bit Docker image](https://github.com
 
 To build the image locally, execute the following command, entering the proper versions taken from the `envs` file:
 ```
-docker build -t fluent-bit:local --build-arg FLB_VERSION=XXX --build-arg GOLANG_VERSION=XXX
+docker build -t fluent-bit:local --build-arg FLB_VERSION=XXX
 ```
 
 ## Sequential HTTP output plugin

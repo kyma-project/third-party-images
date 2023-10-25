@@ -2,10 +2,7 @@
 
 This image is based on the official [Fluent Bit Docker image](https://github.com/fluent/fluent-bit/blob/master/dockerfiles/Dockerfile).
 
-The custom plugin has the following customizations:
-
-* Additional Loki output plugin based on the legacy Grafana Loki sources
-* Sequential HTTP output plugin based on the upstream http output plugin
+The custom image has a sequential HTTP output plugin based on the upstream http output plugin
 
 ## Build locally
 
@@ -13,12 +10,6 @@ To build the image locally, execute the following command, entering the proper v
 ```
 docker build -t fluent-bit:local --build-arg FLB_VERSION=XXX --build-arg GOLANG_VERSION=XXX
 ```
-
-## Loki output plugin
-
-The Kyma logging component ships Loki in the outdated 2.2.1 version still being under Apache 2.0 license. As the current fluent-bit Loki plugin is not compatible anymore with that version of Loki, the legacy fluent-bit plugin provided by Loki is adopted.
-
-The sources are mainly copied to the `plugins/out_grafana_loki` folder, and minor adjustments have been made to the `out_grafana_loki.go` file indicated with `//CUSTOM`.
 
 ## Sequential HTTP output plugin
 

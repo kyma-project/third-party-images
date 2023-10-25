@@ -1,8 +1,6 @@
 # Fluent Bit Docker Image
 
-This image is based on the official [Fluent Bit Docker image](https://github.com/fluent/fluent-bit/blob/master/dockerfiles/Dockerfile).
-
-The custom image has a sequential HTTP output plugin based on the upstream http output plugin
+This image is based on the official [Fluent Bit Docker image](https://github.com/fluent/fluent-bit/blob/master/dockerfiles/Dockerfile). It has a sequential HTTP output plugin based on the upstream http output plugin.
 
 ## Build locally
 

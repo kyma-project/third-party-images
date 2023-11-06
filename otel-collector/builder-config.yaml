@@ -14,7 +14,7 @@ receivers:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/hostmetricsreceiver vOTEL_VERSION
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kubeletstatsreceiver vOTEL_VERSION
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/fluentforwardreceiver vOTEL_VERSION
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/httpcheck vOTEL_VERSION
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/httpcheckreceiver vOTEL_VERSION
 
 processors:
   - gomod: go.opentelemetry.io/collector/processor/batchprocessor vOTEL_VERSION

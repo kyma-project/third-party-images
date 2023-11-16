@@ -20,14 +20,9 @@
 # Common tooling
 /k8s-tools @kyma-project/prow
 /common @kyma-project/prow
-# Telemetry/Observability tooling
-/alertmanager @kyma-project/observability
+
+# Telemetry tooling
 /fluent-bit @kyma-project/observability
-/grafana @kyma-project/observability
-/kiwigrid-sidecar @kyma-project/observability
-/oauth2-proxy @kyma-project/observability
-/prometheus-node-exporter @kyma-project/observability
-/kube-state-metrics @kyma-project/observability
 /otel-collector @kyma-project/observability
 
 # All .md files

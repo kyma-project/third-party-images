@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# image builder base on golang:1.20.5-alpine3.18
-FROM europe-docker.pkg.dev/kyma-project/prod/external/golang@sha256:b036c52b3bcc8e4e31be19a7a902bb9897b2bf18028f40fd306a9778bab5771c as builder
+# image builder base on golang:1.21.3-alpine3.18
+FROM europe-docker.pkg.dev/kyma-project/prod/external/golang@sha256:926f7f7e1ab8509b4e91d5ec6d5916ebb45155b0c8920291ba9f361d65385806 as builder
+
 
 ARG KANIKO_VERSION
 ARG GOARCH=amd64

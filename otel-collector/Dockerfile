@@ -1,7 +1,9 @@
 ARG GOLANG_VERSION
 
-FROM golang:${GOLANG_VERSION} as build
+FROM golang:${GOLANG_VERSION}-alpine as build
 ARG  OTEL_VERSION
+
+RUN apk --update add ca-certificates
 
 WORKDIR /app
 COPY builder-config.yaml .
@@ -11,10 +13,10 @@ RUN sed -i s/OTEL_VERSION/${OTEL_VERSION}/g builder-config.yaml
 RUN go install go.opentelemetry.io/collector/cmd/builder@v${OTEL_VERSION}
 RUN builder --config=builder-config.yaml
 
-FROM gcr.io/distroless/base-debian11
+FROM scratch
 
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
-COPY --from=build /app/kyma-otelcol /
+COPY --from=build --chmod=755 /app/kyma-otelcol /
 
 USER 65532:65532
 

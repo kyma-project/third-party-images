@@ -11,7 +11,7 @@
 /.github/ISSUE_TEMPLATE @kyma-project/technical-writers
 /.github @kyma-project/prow
 
-/cloudsql-proxy @kyma-project/goat
+/cloudsql-proxy @kyma-project/operations
 
 # Serverless tooling
 /docker-registry @kyma-project/Otters

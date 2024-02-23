@@ -33,5 +33,4 @@ exporters:
 extensions:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension vOTEL_VERSION
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension vOTEL_VERSION
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage vOTEL_VERSION
-    import: github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage vOTEL_VERSION

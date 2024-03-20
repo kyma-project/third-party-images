@@ -10,7 +10,6 @@ ENV PATH /go/bin:$PATH
 
 ARG PROMETHEUS_VERSION
 
-
 RUN mkdir -p ${GOPATH}/src ${GOPATH}/bin
 WORKDIR /
 RUN curl -LO https://github.com/prometheus/prometheus/archive/refs/tags/v${PROMETHEUS_VERSION}.tar.gz
@@ -22,6 +21,8 @@ RUN make build
 
 FROM alpine:${ALPINE_VERSION}
 RUN apk --no-cache upgrade
+
+ARG PROMETHEUS_VERSION
 
 RUN mkdir /etc/prometheus
 

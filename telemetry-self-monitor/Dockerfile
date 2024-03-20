@@ -1,4 +1,3 @@
-ARG PROMETHEUS_VERSION
 ARG ALPINE_VERSION
 
 FROM node:alpine${ALPINE_VERSION} as builder
@@ -9,10 +8,13 @@ ENV GOROOT /usr/lib/go
 ENV GOPATH /go
 ENV PATH /go/bin:$PATH
 
+ARG PROMETHEUS_VERSION
+
+
 RUN mkdir -p ${GOPATH}/src ${GOPATH}/bin
 WORKDIR /
-RUN curl -LO https://github.com/prometheus/prometheus/archive/refs/tags/v${PROMETHEUS_VERSION}.tar.gz  && \
-    tar xvzf v${PROMETHEUS_VERSION}.tar.gz
+RUN curl -LO https://github.com/prometheus/prometheus/archive/refs/tags/v${PROMETHEUS_VERSION}.tar.gz
+RUN tar xvzf v${PROMETHEUS_VERSION}.tar.gz
 
 WORKDIR /prometheus-${PROMETHEUS_VERSION}
 COPY plugins.yml plugins.yml

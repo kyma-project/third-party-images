@@ -19,6 +19,7 @@ COPY plugins.yml plugins.yml
 RUN make build
 
 FROM alpine:${ALPINE_VERSION}
+RUN apk --no-cache upgrade
 
 RUN mkdir /etc/prometheus
 

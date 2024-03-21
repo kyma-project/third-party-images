@@ -19,24 +19,13 @@ WORKDIR /prometheus-${PROMETHEUS_VERSION}
 COPY plugins.yml plugins.yml
 RUN make build
 
-FROM alpine:${ALPINE_VERSION}
-RUN apk --no-cache upgrade
+FROM scratch
 
 ARG PROMETHEUS_VERSION
 
-RUN mkdir /etc/prometheus
-
 COPY --from=builder /prometheus-${PROMETHEUS_VERSION}/prometheus /bin/prometheus
-COPY --from=builder /prometheus-${PROMETHEUS_VERSION}/console_libraries /etc/prometheus/console_libraries
-COPY --from=builder /prometheus-${PROMETHEUS_VERSION}/consoles /etc/prometheus/consoles
-
-RUN chown -R nobody:nobody  /etc/prometheus
 
 USER       nobody
 EXPOSE     9090
 
 ENTRYPOINT [ "/bin/prometheus" ]
-CMD        [ "--config.file=/etc/prometheus/prometheus.yml", \
-             "--storage.tsdb.path=/prometheus", \
-             "--web.console.libraries=/etc/prometheus/console_libraries", \
-             "--web.console.templates=/etc/prometheus/consoles"  ]

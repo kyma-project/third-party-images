@@ -1,7 +1,9 @@
 ARG ALPINE_VERSION
 
 FROM node:alpine${ALPINE_VERSION} as builder
+
 RUN apk add --no-cache git make musl-dev go curl bash
+RUN apk --no-cache upgrade
 
 # Configure Go
 ENV GOROOT /usr/lib/go

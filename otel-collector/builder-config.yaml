@@ -38,4 +38,3 @@ extensions:
 replaces:
   # a list of "replaces" directives that will be part of the resulting go.mod
   - github.com/go-resty/resty/v2 => github.com/go-resty/resty/v2 v2.12.0
-

@@ -65,20 +65,20 @@ RUN \
   cat /etc/ssl/certs/* > /ca-certificates.crt
 
 FROM scratch
-COPY --from=0 /go/src/github.com/GoogleContainerTools/kaniko/out/executor /kaniko/executor
-COPY --from=0 /usr/local/bin/docker-credential-gcr /kaniko/docker-credential-gcr
-COPY --from=0 /go/src/github.com/awslabs/amazon-ecr-credential-helper/bin/local/docker-credential-ecr-login /kaniko/docker-credential-ecr-login
-COPY --from=0 /go/src/github.com/chrismellard/docker-credential-acr-env/build/docker-credential-acr-env /kaniko/docker-credential-acr
-COPY --from=certs /ca-certificates.crt /kaniko/ssl/certs/
-COPY --from=0 /kaniko/.docker /kaniko/.docker
+COPY --from=0 /go/src/github.com/GoogleContainerTools/kaniko/out/executor /workspace/kaniko/executor
+COPY --from=0 /usr/local/bin/docker-credential-gcr /workspace/kaniko/docker-credential-gcr
+COPY --from=0 /go/src/github.com/awslabs/amazon-ecr-credential-helper/bin/local/docker-credential-ecr-login /workspace/kaniko/docker-credential-ecr-login
+COPY --from=0 /go/src/github.com/chrismellard/docker-credential-acr-env/build/docker-credential-acr-env /workspace/kaniko/docker-credential-acr
+COPY --from=certs /ca-certificates.crt /workspace/kaniko/ssl/certs/
+COPY --from=0 /kaniko/.docker /workspace/kaniko/.docker
 COPY --from=0 /go/src/github.com/GoogleContainerTools/kaniko/files/nsswitch.conf /etc/nsswitch.conf
 ENV HOME /root
 ENV USER root
-ENV PATH /usr/local/bin:/kaniko
+ENV PATH /usr/local/bin:/workspace/kaniko
 ENV SSL_CERT_DIR=/kaniko/ssl/certs
-ENV DOCKER_CONFIG /kaniko/.docker/
-ENV DOCKER_CREDENTIAL_GCR_CONFIG /kaniko/.config/gcloud/docker_credential_gcr_config.json
+ENV DOCKER_CONFIG /workspace/kaniko/.docker/
+ENV DOCKER_CREDENTIAL_GCR_CONFIG /workspace/kaniko/.config/gcloud/docker_credential_gcr_config.json
 WORKDIR /workspace
 RUN ["docker-credential-gcr", "config", "--token-source=env"]
 
-ENTRYPOINT ["/kaniko/executor"]
+ENTRYPOINT ["/workspace/kaniko/executor"]

@@ -1,7 +1,7 @@
-ARG GOLANG_VERSION
+ARG GOLANG_VERSION=1.22
 
 FROM golang:${GOLANG_VERSION}-alpine as build
-ARG  OTEL_VERSION
+ARG  OTEL_VERSION=0.97.0
 
 RUN apk --update add ca-certificates
 

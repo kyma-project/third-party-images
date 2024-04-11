@@ -1,6 +1,8 @@
-ARG ALPINE_VERSION
+ARG ALPINE_VERSION=3.19
 
 FROM node:alpine${ALPINE_VERSION} as builder
+
+ARG PROMETHEUS_VERSION=2.45.4
 
 RUN apk add --no-cache git make musl-dev go curl bash
 RUN apk --no-cache upgrade

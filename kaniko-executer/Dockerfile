@@ -16,7 +16,7 @@
 FROM europe-docker.pkg.dev/kyma-project/prod/external/golang@sha256:55f716237933c85cee01748700755b4ac8736fb1ca974c9aed051691b68d6dc2 as builder
 
 
-ARG KANIKO_VERSION=1.9.2
+ARG KANIKO_VERSION
 ARG GOARCH=amd64
 WORKDIR /go/src/github.com/GoogleContainerTools/kaniko
 

@@ -6,6 +6,7 @@ ENV GO111MODULE=auto
 ENV DISTRIBUTION_DIR /go/src/github.com/docker/distribution
 ENV BUILDTAGS include_oss include_gcs
 
+ARG REGISTRY_VERSION
 ARG GOOS=linux
 ARG GOARCH=amd64
 ARG GOARM=6
@@ -15,7 +16,7 @@ RUN set -ex \
     && apk add --no-cache make git file
 
 WORKDIR $DISTRIBUTION_DIR
-RUN git clone -b v2.8.1 https://github.com/distribution/distribution $DISTRIBUTION_DIR
+RUN git clone -b v${REGISTRY_VERSION} https://github.com/distribution/distribution $DISTRIBUTION_DIR
 
 RUN CGO_ENABLED=0 make PREFIX=/go clean binaries && file ./bin/registry | grep "statically linked"
 

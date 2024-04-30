@@ -1,1 +1,3 @@
-FROM gcr.io/cloudsql-docker/gce-proxy:1.33.16
+ARG PROXY_VERSION
+
+FROM gcr.io/cloudsql-docker/gce-proxy:${PROXY_VERSION}

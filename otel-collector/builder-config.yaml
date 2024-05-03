@@ -29,6 +29,7 @@ exporters:
   - gomod: go.opentelemetry.io/collector/exporter/otlpexporter vOTEL_VERSION
   - gomod: go.opentelemetry.io/collector/exporter/otlphttpexporter vOTEL_VERSION
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter vOTEL_VERSION
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusexporter vOTEL_VERSION
 
 extensions:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension vOTEL_VERSION

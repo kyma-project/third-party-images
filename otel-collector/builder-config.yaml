@@ -8,7 +8,6 @@ dist:
 
 receivers:
   - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver vOTEL_VERSION
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/opencensusreceiver vOTEL_VERSION
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver vOTEL_VERSION
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver vOTEL_VERSION
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/hostmetricsreceiver vOTEL_VERSION

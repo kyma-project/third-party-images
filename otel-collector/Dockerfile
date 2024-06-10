@@ -2,13 +2,16 @@ ARG GOLANG_VERSION
 
 FROM golang:${GOLANG_VERSION}-alpine as build
 ARG  OTEL_VERSION
+ARG  OTEL_CONTRIB_VERSION=${OTEL_VERSION}
 
 RUN apk --update add ca-certificates
 
 WORKDIR /app
 COPY builder-config.yaml .
 ENV OTEL_VERSION ${OTEL_VERSION}
+ENV OTEL_CONTRIB_VERSION ${OTEL_CONTRIB_VERSION}
 RUN sed -i s/OTEL_VERSION/${OTEL_VERSION}/g builder-config.yaml
+RUN sed -i s/OTEL_CONTRIB_VERSION/${OTEL_CONTRIB_VERSION}/g builder-config.yaml
 
 RUN go install go.opentelemetry.io/collector/cmd/builder@v${OTEL_VERSION}
 RUN builder --config=builder-config.yaml

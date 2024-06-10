@@ -15,8 +15,6 @@ RUN sed -i s/OTEL_CONTRIB_VERSION/${OTEL_CONTRIB_VERSION}/g builder-config.yaml
 
 RUN go install go.opentelemetry.io/collector/cmd/builder@v${OTEL_VERSION}
 
-RUN cat builder-config.yaml
-
 RUN builder --config=builder-config.yaml
 
 FROM scratch

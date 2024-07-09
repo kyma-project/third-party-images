@@ -4,8 +4,7 @@ on:
   pull_request_target:
     paths:
       - "fluent-bit/**"
-    types:
-      - ready_for_review
+    types: [ opened, edited, synchronize, reopened, ready_for_review ]
   push:
     branches:
       - main
@@ -63,7 +62,7 @@ jobs:
       dockerfile: fluent-bit/Dockerfile
       context: .
       build-args: ${{ needs.envs.outputs.build-args }}
-      tag: ${{ needs.envs.outputs.build-tag }}
+      tags: ${{ needs.envs.outputs.build-tag }}
   list-images:
     needs: build-image
     runs-on: ubuntu-latest

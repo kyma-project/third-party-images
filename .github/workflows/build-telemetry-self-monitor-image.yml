@@ -22,6 +22,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Fetch new env file
+        run: |
+          git fetch origin ${{ github.event.pull_request.head.sha }}
+          git checkout ${{ github.event.pull_request.head.sha }} --no-overlay -- telemetry-self-monitor/envs
+        if: github.event_name == 'pull_request_target'
+
       - name: Prepare Envs
         id: prepare-envs
         run: |
@@ -33,12 +39,6 @@ jobs:
           echo BUILD_ARGS
 
           } >> "$GITHUB_OUTPUT"
-
-      - name: Fetch new env file
-        run: |
-          git fetch origin ${{ github.event.pull_request.head.sha }}
-          git checkout ${{ github.event.pull_request.head.sha }} --no-overlay -- telemetry-self-monitor/envs
-        if: github.event_name == 'pull_request_target'
 
       - name: load envs into output
         id: load-envs

@@ -60,7 +60,7 @@ jobs:
     with:
       name: tpi/telemetry-self-monitor
       dockerfile: telemetry-self-monitor/Dockerfile
-      context: .
+      context: telemetry-self-monitor
       build-args: ${{ needs.envs.outputs.build-args }}
       tags: ${{ needs.envs.outputs.build-tag }}
   list-images:

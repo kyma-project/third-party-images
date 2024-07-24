@@ -59,7 +59,7 @@ jobs:
     uses: kyma-project/test-infra/.github/workflows/image-builder.yml@main
     with:
       name: tpi/telemetry-self-monitor
-      dockerfile: telemetry-self-monitor/Dockerfile
+      dockerfile: Dockerfile
       context: telemetry-self-monitor
       build-args: ${{ needs.envs.outputs.build-args }}
       tags: ${{ needs.envs.outputs.build-tag }}

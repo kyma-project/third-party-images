@@ -59,8 +59,8 @@ jobs:
     uses: kyma-project/test-infra/.github/workflows/image-builder.yml@main
     with:
       name: tpi/fluent-bit
-      dockerfile: fluent-bit/Dockerfile
-      context: .
+      dockerfile: Dockerfile
+      context: fluent-bit
       build-args: ${{ needs.envs.outputs.build-args }}
       tags: ${{ needs.envs.outputs.build-tag }}
   list-images:

@@ -22,7 +22,6 @@
 /common @kyma-project/prow
 
 # Telemetry tooling
-/fluent-bit @kyma-project/observability
 /telemetry-self-monitor @kyma-project/observability
 
 # All .md files

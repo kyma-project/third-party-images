@@ -11,18 +11,9 @@
 /.github/ISSUE_TEMPLATE @kyma-project/technical-writers
 /.github @kyma-project/prow
 
-/cloudsql-proxy @kyma-project/operations
-
-# Serverless tooling
-/docker-registry @kyma-project/Otters
-/kaniko-executer @kyma-project/Otters
-
 # Common tooling
 /k8s-tools @kyma-project/prow
 /common @kyma-project/prow
-
-# Telemetry tooling
-/telemetry-self-monitor @kyma-project/observability
 
 # All .md files
 *.md @kyma-project/technical-writers
